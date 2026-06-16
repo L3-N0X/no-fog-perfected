@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "de.lenox.client.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+  ],
+  "client": [
+    "MixinFogRenderer"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

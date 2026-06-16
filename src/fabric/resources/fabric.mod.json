@@ -1,0 +1,46 @@
+{
+	"schemaVersion": 1,
+	"id": "no-fog-perfected",
+	"version": "${version}",
+	"name": "No Fog Perfected",
+	"description": "Removes fog from Minecraft, perfected.",
+	"authors": [
+		"L3-N0X"
+	],
+	"contact": {
+		"homepage": "https://modrinth.com/mod/no-fog-perfected",
+		"sources": "https://github.com/L3-N0X/no-fog-perfected"
+	},
+	"license": "MIT",
+	"icon": "assets/no-fog-perfected/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			{
+				"value": "de.lenox.client.NoFogClient",
+				"adapter": "kotlin"
+			}
+		],
+		"modmenu": [
+			{
+				"value": "de.lenox.client.ModMenuIntegration",
+				"adapter": "kotlin"
+			}
+		],
+		"sodium:config_api_user": [
+			"de.lenox.client.NoFogSodiumConfig"
+		]
+	},
+	"mixins": [
+		{
+			"config": "no-fog-perfected.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=${loader_version}",
+		"minecraft": "${minecraft_dependency}",
+		"fabric-api": "*",
+		"fabric-language-kotlin": "*"
+	}
+}
