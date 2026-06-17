@@ -1,5 +1,6 @@
 package de.lenox.client.mixin
 
+import de.lenox.client.FogSliderFormulas
 import de.lenox.client.NoFogConfig
 import de.lenox.client.NoFogMod
 import net.minecraft.client.Camera
@@ -50,9 +51,9 @@ abstract class MixinFogRenderer {
         val applyLavaOffset = fogType == FogType.LAVA && NoFogConfig.lavaFog && NoFogConfig.lavaFogOffset > 0f
         val applyPowderSnowOffset = fogType == FogType.POWDER_SNOW && NoFogConfig.powderSnowFog && NoFogConfig.powderSnowFogOffset > 0f
 
-        val applyOverworldOffset = fogType == FogType.ATMOSPHERIC && level.dimension() == Level.OVERWORLD && NoFogConfig.overworldFogOffset != 1f
-        val applyNetherOffset = fogType == FogType.ATMOSPHERIC && level.dimension() == Level.NETHER && NoFogConfig.netherFogOffset != 1f
-        val applyEndOffset = fogType == FogType.ATMOSPHERIC && level.dimension() == Level.END && NoFogConfig.endFogOffset != 1f
+        val applyOverworldOffset = fogType == FogType.ATMOSPHERIC && level.dimension() == Level.OVERWORLD && NoFogConfig.overworldFogOffset > 0f
+        val applyNetherOffset = fogType == FogType.ATMOSPHERIC && level.dimension() == Level.NETHER && NoFogConfig.netherFogOffset > 0f
+        val applyEndOffset = fogType == FogType.ATMOSPHERIC && level.dimension() == Level.END && NoFogConfig.endFogOffset > 0f
 
         if (keepFog && !applyWaterOffset && !applyLavaOffset && !applyPowderSnowOffset && !applyOverworldOffset && !applyNetherOffset && !applyEndOffset) return
 
@@ -70,21 +71,27 @@ abstract class MixinFogRenderer {
                 applyLavaOffset -> NoFogConfig.lavaFogOffset
                 else -> NoFogConfig.powderSnowFogOffset
             }
-            val maxDist = if (applyWaterOffset) 1000f else if (applyLavaOffset) 200f else 120f
+            val maxDist = when {
+                applyWaterOffset -> FogSliderFormulas.WATER_MAX_DISTANCE
+                applyLavaOffset -> FogSliderFormulas.LAVA_MAX_DISTANCE
+                else -> FogSliderFormulas.POWDER_SNOW_MAX_DISTANCE
+            }
             fogData.environmentalEnd = (fogData.environmentalEnd + offset).coerceAtMost(maxDist)
             fogData.renderDistanceEnd = (fogData.renderDistanceEnd + offset).coerceAtMost(maxDist)
-        } else if (applyOverworldOffset || applyNetherOffset || applyEndOffset) {
-            val multiplier = when {
+        } else if (applyNetherOffset) {
+            fogData.environmentalStart = (fogData.environmentalStart +  NoFogConfig.netherFogOffset / 2f)
+            fogData.environmentalEnd = (fogData.environmentalEnd +  NoFogConfig.netherFogOffset)
+            fogData.renderDistanceStart = (fogData.renderDistanceStart +  NoFogConfig.netherFogOffset / 2f)
+            fogData.renderDistanceEnd = (fogData.renderDistanceEnd +  NoFogConfig.netherFogOffset)
+        } else if (applyOverworldOffset || applyEndOffset) {
+            val offset = when {
                 applyOverworldOffset -> NoFogConfig.overworldFogOffset
-                applyNetherOffset -> NoFogConfig.netherFogOffset
                 else -> NoFogConfig.endFogOffset
             }
-            fogData.environmentalStart *= multiplier
-            fogData.environmentalEnd *= multiplier
-            fogData.renderDistanceStart *= multiplier
-            fogData.renderDistanceEnd *= multiplier
-            NoFogMod.LOGGER.info("Overworld fog: ${fogData.environmentalStart} - ${fogData.environmentalEnd} - ${fogData.renderDistanceStart} - ${fogData.renderDistanceEnd}")
-            NoFogMod.LOGGER.info("Multiplier: $multiplier")
+            fogData.environmentalStart = (fogData.environmentalStart * (offset / FogSliderFormulas.DIMENSION_MAX_DISTANCE + 1f))
+            fogData.environmentalEnd = (fogData.environmentalEnd * (offset / FogSliderFormulas.DIMENSION_MAX_DISTANCE + 1f))
+            fogData.renderDistanceStart = (fogData.renderDistanceStart * (offset / FogSliderFormulas.DIMENSION_MAX_DISTANCE + 1f))
+            fogData.renderDistanceEnd = (fogData.renderDistanceEnd * (offset / FogSliderFormulas.DIMENSION_MAX_DISTANCE + 1f))
         } else {
             fogData.environmentalStart = 1e9f
             fogData.environmentalEnd = 1e9f

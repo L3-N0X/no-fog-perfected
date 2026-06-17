@@ -20,9 +20,9 @@ object NoFogConfig {
     var waterFogOffset: Float = 0f
     var lavaFogOffset: Float = 0f
     var powderSnowFogOffset: Float = 0f
-    var overworldFogOffset: Float = 1f
-    var netherFogOffset: Float = 1f
-    var endFogOffset: Float = 1f
+    var overworldFogOffset: Float = 0f
+    var netherFogOffset: Float = 0f
+    var endFogOffset: Float = 0f
 
     fun init() {
         val mc = Minecraft.getInstance()
@@ -96,8 +96,8 @@ object NoFogConfig {
         val waterFogOffset: Float = 0f,
         val lavaFogOffset: Float = 0f,
         val powderSnowFogOffset: Float = 0f,
-        val overworldFogOffset: Float = 1f,
-        val netherFogOffset: Float = 1f,
-        val endFogOffset: Float = 1f
+        val overworldFogOffset: Float = 0f,
+        val netherFogOffset: Float = 0f,
+        val endFogOffset: Float = 0f
     )
 }

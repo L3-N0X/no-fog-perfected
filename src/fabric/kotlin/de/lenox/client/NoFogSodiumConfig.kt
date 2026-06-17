@@ -5,8 +5,6 @@ import net.caffeinemc.mods.sodium.api.config.option.Range
 import net.caffeinemc.mods.sodium.api.config.structure.ConfigBuilder
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
-import kotlin.math.pow
-import kotlin.math.sqrt
 
 class NoFogSodiumConfig : ConfigEntryPoint {
     override fun registerConfigLate(builder: ConfigBuilder) {
@@ -112,11 +110,11 @@ class NoFogSodiumConfig : ConfigEntryPoint {
                         .setName(Component.literal("Water Fog Offset"))
                         .setTooltip(Component.literal("Offsets the water fog further away from the player.\nAt 0%%, the default vanilla fog distance is used.\nHigher values push the fog further out while preserving the gradient.\nThe value scales quadratically for easier fine-tuning at lower distances."))
                         .setStorageHandler { NoFogConfig.save() }
-                        .setRange(Range(0, 100, 1))
+                        .setRange(Range(FogSliderFormulas.FLUID_FOG_SLIDER_MIN, FogSliderFormulas.FLUID_FOG_SLIDER_MAX, 1))
                         .setValueFormatter { value -> Component.literal("$value%") }
                         .setBinding(
-                            { value -> NoFogConfig.waterFogOffset = ((value.toDouble() / 100.0).pow(2) * 1000f).toFloat() },
-                            { ((sqrt(NoFogConfig.waterFogOffset.toDouble() / 1000f) * 100.0).toInt()).coerceIn(0, 100) }
+                            { value -> NoFogConfig.waterFogOffset = FogSliderFormulas.sliderToFluidOffset(value, FogSliderFormulas.WATER_MAX_DISTANCE) },
+                            { FogSliderFormulas.fluidOffsetToSlider(NoFogConfig.waterFogOffset, FogSliderFormulas.WATER_MAX_DISTANCE) }
                         )
                         .setDefaultValue(0)
                     )
@@ -124,11 +122,11 @@ class NoFogSodiumConfig : ConfigEntryPoint {
                         .setName(Component.literal("Lava Fog Offset"))
                         .setTooltip(Component.literal("Offsets the lava fog further away from the player.\nAt 0%%, the default vanilla fog distance is used.\nHigher values push the fog further out while preserving the gradient.\nThe value scales quadratically for easier fine-tuning at lower distances."))
                         .setStorageHandler { NoFogConfig.save() }
-                        .setRange(Range(0, 100, 1))
+                        .setRange(Range(FogSliderFormulas.FLUID_FOG_SLIDER_MIN, FogSliderFormulas.FLUID_FOG_SLIDER_MAX, 1))
                         .setValueFormatter { value -> Component.literal("$value%") }
                         .setBinding(
-                            { value -> NoFogConfig.lavaFogOffset = ((value.toDouble() / 100.0).pow(2) * 200f).toFloat() },
-                            { ((sqrt(NoFogConfig.lavaFogOffset.toDouble() / 200f) * 100.0).toInt()).coerceIn(0, 100) }
+                            { value -> NoFogConfig.lavaFogOffset = FogSliderFormulas.sliderToFluidOffset(value, FogSliderFormulas.LAVA_MAX_DISTANCE) },
+                            { FogSliderFormulas.fluidOffsetToSlider(NoFogConfig.lavaFogOffset, FogSliderFormulas.LAVA_MAX_DISTANCE) }
                         )
                         .setDefaultValue(0)
                     )
@@ -136,11 +134,11 @@ class NoFogSodiumConfig : ConfigEntryPoint {
                         .setName(Component.literal("Powder Snow Fog Offset"))
                         .setTooltip(Component.literal("Offsets the powder snow fog further away from the player.\nAt 0%%, the default vanilla fog distance is used.\nHigher values push the fog further out while preserving the gradient.\nThe value scales quadratically for easier fine-tuning at lower distances."))
                         .setStorageHandler { NoFogConfig.save() }
-                        .setRange(Range(0, 100, 1))
+                        .setRange(Range(FogSliderFormulas.FLUID_FOG_SLIDER_MIN, FogSliderFormulas.FLUID_FOG_SLIDER_MAX, 1))
                         .setValueFormatter { value -> Component.literal("$value%") }
                         .setBinding(
-                            { value -> NoFogConfig.powderSnowFogOffset = ((value.toDouble() / 100.0).pow(2) * 200f).toFloat() },
-                            { ((sqrt(NoFogConfig.powderSnowFogOffset.toDouble() / 200f) * 100.0).toInt()).coerceIn(0, 100) }
+                            { value -> NoFogConfig.powderSnowFogOffset = FogSliderFormulas.sliderToFluidOffset(value, FogSliderFormulas.POWDER_SNOW_MAX_DISTANCE) },
+                            { FogSliderFormulas.fluidOffsetToSlider(NoFogConfig.powderSnowFogOffset, FogSliderFormulas.POWDER_SNOW_MAX_DISTANCE) }
                         )
                         .setDefaultValue(0)
                     )
@@ -149,39 +147,39 @@ class NoFogSodiumConfig : ConfigEntryPoint {
                     .setName(Component.literal("Dimension Fog Offset"))
                     .addOption(builder.createIntegerOption(Identifier.fromNamespaceAndPath("no-fog-perfected", "overworld_fog_offset"))
                         .setName(Component.literal("Overworld Fog Offset"))
-                        .setTooltip(Component.literal("Multiplies the overworld fog distance.\nAt 100%%, the default vanilla fog distance is used.\nHigher values push the fog further out proportionally.\nThe gradient is preserved."))
+                        .setTooltip(Component.literal("Offsets the overworld fog further away from the player.\nAt 0%%, the default vanilla fog distance is used.\nHigher values push the fog further out while preserving the gradient.\nThe value scales quadratically for easier fine-tuning at lower distances."))
                         .setStorageHandler { NoFogConfig.save() }
-                        .setRange(Range(100, 300, 1))
-                        .setValueFormatter { value -> Component.literal("$value%%") }
+                        .setRange(Range(FogSliderFormulas.DIMENSION_FOG_SLIDER_MIN, FogSliderFormulas.DIMENSION_FOG_SLIDER_MAX, 1))
+                        .setValueFormatter { value -> Component.literal("$value%") }
                         .setBinding(
-                            { value -> NoFogConfig.overworldFogOffset = value.toFloat() / 100f },
-                            { (NoFogConfig.overworldFogOffset * 100f).toInt().coerceIn(100, 300) }
+                            { value -> NoFogConfig.overworldFogOffset = FogSliderFormulas.sliderToDimensionOffset(value) },
+                            { FogSliderFormulas.dimensionOffsetToSlider(NoFogConfig.overworldFogOffset) }
                         )
-                        .setDefaultValue(100)
+                        .setDefaultValue(0)
                     )
                     .addOption(builder.createIntegerOption(Identifier.fromNamespaceAndPath("no-fog-perfected", "nether_fog_offset"))
                         .setName(Component.literal("Nether Fog Offset"))
-                        .setTooltip(Component.literal("Multiplies the nether fog distance.\nAt 100%%, the default vanilla fog distance is used.\nHigher values push the fog further out proportionally.\nThe gradient is preserved."))
+                        .setTooltip(Component.literal("Offsets the nether fog further away from the player.\nAt 0%%, the default vanilla fog distance is used.\nHigher values push the fog further out while preserving the gradient.\nThe value scales quadratically for easier fine-tuning at lower distances."))
                         .setStorageHandler { NoFogConfig.save() }
-                        .setRange(Range(100, 300, 1))
-                        .setValueFormatter { value -> Component.literal("$value%%") }
+                        .setRange(Range(FogSliderFormulas.DIMENSION_FOG_SLIDER_MIN, FogSliderFormulas.DIMENSION_FOG_SLIDER_MAX, 1))
+                        .setValueFormatter { value -> Component.literal("$value%") }
                         .setBinding(
-                            { value -> NoFogConfig.netherFogOffset = value.toFloat() / 100f },
-                            { (NoFogConfig.netherFogOffset * 100f).toInt().coerceIn(100, 300) }
+                            { value -> NoFogConfig.netherFogOffset = FogSliderFormulas.sliderToDimensionOffset(value) },
+                            { FogSliderFormulas.dimensionOffsetToSlider(NoFogConfig.netherFogOffset) }
                         )
-                        .setDefaultValue(100)
+                        .setDefaultValue(0)
                     )
                     .addOption(builder.createIntegerOption(Identifier.fromNamespaceAndPath("no-fog-perfected", "end_fog_offset"))
                         .setName(Component.literal("End Fog Offset"))
-                        .setTooltip(Component.literal("Multiplies the end fog distance.\nAt 100%%, the default vanilla fog distance is used.\nHigher values push the fog further out proportionally.\nThe gradient is preserved."))
+                        .setTooltip(Component.literal("Offsets the end fog further away from the player.\nAt 0%%, the default vanilla fog distance is used.\nHigher values push the fog further out while preserving the gradient.\nThe value scales quadratically for easier fine-tuning at lower distances."))
                         .setStorageHandler { NoFogConfig.save() }
-                        .setRange(Range(100, 300, 1))
-                        .setValueFormatter { value -> Component.literal("$value%%") }
+                        .setRange(Range(FogSliderFormulas.DIMENSION_FOG_SLIDER_MIN, FogSliderFormulas.DIMENSION_FOG_SLIDER_MAX, 1))
+                        .setValueFormatter { value -> Component.literal("$value%") }
                         .setBinding(
-                            { value -> NoFogConfig.endFogOffset = value.toFloat() / 100f },
-                            { (NoFogConfig.endFogOffset * 100f).toInt().coerceIn(100, 300) }
+                            { value -> NoFogConfig.endFogOffset = FogSliderFormulas.sliderToDimensionOffset(value) },
+                            { FogSliderFormulas.dimensionOffsetToSlider(NoFogConfig.endFogOffset) }
                         )
-                        .setDefaultValue(100)
+                        .setDefaultValue(0)
                     )
                 )
             )
