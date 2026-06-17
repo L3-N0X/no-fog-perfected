@@ -20,9 +20,9 @@ object NoFogConfig {
     var waterFogOffset: Float = 0f
     var lavaFogOffset: Float = 0f
     var powderSnowFogOffset: Float = 0f
-    var overworldFogOffset: Float = 0f
+    var overworldFogMultiplier: Double = 1.0
     var netherFogOffset: Float = 0f
-    var endFogOffset: Float = 0f
+    var endFogMultiplier: Double = 1.0
 
     fun init() {
         val mc = Minecraft.getInstance()
@@ -50,9 +50,9 @@ object NoFogConfig {
             waterFogOffset = data.waterFogOffset
             lavaFogOffset = data.lavaFogOffset
             powderSnowFogOffset = data.powderSnowFogOffset
-            overworldFogOffset = data.overworldFogOffset
+            overworldFogMultiplier = data.overworldFogMultiplier
             netherFogOffset = data.netherFogOffset
-            endFogOffset = data.endFogOffset
+            endFogMultiplier = data.endFogMultiplier
         } catch (e: Exception) {
             NoFogMod.LOGGER.warn("Failed to load no-fog config, using defaults", e)
         }
@@ -74,9 +74,9 @@ object NoFogConfig {
                 waterFogOffset = waterFogOffset,
                 lavaFogOffset = lavaFogOffset,
                 powderSnowFogOffset = powderSnowFogOffset,
-                overworldFogOffset = overworldFogOffset,
+                overworldFogMultiplier = overworldFogMultiplier,
                 netherFogOffset = netherFogOffset,
-                endFogOffset = endFogOffset
+                endFogMultiplier = endFogMultiplier
             )
             file.writeText(GSON.toJson(data))
         } catch (e: Exception) {
@@ -96,8 +96,8 @@ object NoFogConfig {
         val waterFogOffset: Float = 0f,
         val lavaFogOffset: Float = 0f,
         val powderSnowFogOffset: Float = 0f,
-        val overworldFogOffset: Float = 0f,
+        val overworldFogMultiplier: Double = 1.0,
         val netherFogOffset: Float = 0f,
-        val endFogOffset: Float = 0f
+        val endFogMultiplier: Double = 1.0
     )
 }

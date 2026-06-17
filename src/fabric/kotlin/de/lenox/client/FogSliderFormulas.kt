@@ -14,6 +14,9 @@ object FogSliderFormulas {
     const val POWDER_SNOW_MAX_DISTANCE = 120f
     const val DIMENSION_MAX_DISTANCE = 800f
 
+    const val DIMENSION_FOG_MULTIPLIER_MIN = 1.0
+    const val DIMENSION_FOG_MULTIPLIER_MAX = 5.0
+
     fun sliderToFluidOffset(slider: Int, maxDistance: Float): Float {
         return ((slider.toDouble() / 100.0).pow(2) * maxDistance).toFloat()
     }
@@ -28,5 +31,13 @@ object FogSliderFormulas {
 
     fun dimensionOffsetToSlider(offset: Float): Int {
         return (sqrt(offset.toDouble() / DIMENSION_MAX_DISTANCE) * 100.0).toInt()
+    }
+
+    fun sliderToDimensionMultiplier(slider: Int): Double {
+        return DIMENSION_FOG_MULTIPLIER_MIN + (slider.toDouble() / 100.0).pow(4) * (DIMENSION_FOG_MULTIPLIER_MAX - DIMENSION_FOG_MULTIPLIER_MIN)
+    }
+
+    fun dimensionMultiplierToSlider(multiplier: Double): Int {
+        return (((multiplier - DIMENSION_FOG_MULTIPLIER_MIN) / (DIMENSION_FOG_MULTIPLIER_MAX - DIMENSION_FOG_MULTIPLIER_MIN)).pow(1.0 / 4.0) * 100.0).toInt()
     }
 }

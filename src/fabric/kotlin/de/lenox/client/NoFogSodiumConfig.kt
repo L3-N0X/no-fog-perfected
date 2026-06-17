@@ -144,16 +144,16 @@ class NoFogSodiumConfig : ConfigEntryPoint {
                     )
                 )
                 .addOptionGroup(builder.createOptionGroup()
-                    .setName(Component.literal("Dimension Fog Offset"))
-                    .addOption(builder.createIntegerOption(Identifier.fromNamespaceAndPath("no-fog-perfected", "overworld_fog_offset"))
-                        .setName(Component.literal("Overworld Fog Offset"))
-                        .setTooltip(Component.literal("Offsets the overworld fog further away from the player.\nAt 0%%, the default vanilla fog distance is used.\nHigher values push the fog further out while preserving the gradient.\nThe value scales quadratically for easier fine-tuning at lower distances."))
+                    .setName(Component.literal("Dimension Fog Multiplier"))
+                    .addOption(builder.createIntegerOption(Identifier.fromNamespaceAndPath("no-fog-perfected", "overworld_fog_multiplier"))
+                        .setName(Component.literal("Overworld Fog Multiplier"))
+                        .setTooltip(Component.literal("Multiplies the overworld fog distance from the player.\nAt 0%%, the default vanilla fog distance is used (1.0x).\nHigher values scale the fog further out proportionally to the render distance.\nThe value scales quadratically for easier fine-tuning at lower multipliers."))
                         .setStorageHandler { NoFogConfig.save() }
                         .setRange(Range(FogSliderFormulas.DIMENSION_FOG_SLIDER_MIN, FogSliderFormulas.DIMENSION_FOG_SLIDER_MAX, 1))
                         .setValueFormatter { value -> Component.literal("$value%") }
                         .setBinding(
-                            { value -> NoFogConfig.overworldFogOffset = FogSliderFormulas.sliderToDimensionOffset(value) },
-                            { FogSliderFormulas.dimensionOffsetToSlider(NoFogConfig.overworldFogOffset) }
+                            { value -> NoFogConfig.overworldFogMultiplier = FogSliderFormulas.sliderToDimensionMultiplier(value) },
+                            { FogSliderFormulas.dimensionMultiplierToSlider(NoFogConfig.overworldFogMultiplier) }
                         )
                         .setDefaultValue(0)
                     )
@@ -169,15 +169,15 @@ class NoFogSodiumConfig : ConfigEntryPoint {
                         )
                         .setDefaultValue(0)
                     )
-                    .addOption(builder.createIntegerOption(Identifier.fromNamespaceAndPath("no-fog-perfected", "end_fog_offset"))
-                        .setName(Component.literal("End Fog Offset"))
-                        .setTooltip(Component.literal("Offsets the end fog further away from the player.\nAt 0%%, the default vanilla fog distance is used.\nHigher values push the fog further out while preserving the gradient.\nThe value scales quadratically for easier fine-tuning at lower distances."))
+                    .addOption(builder.createIntegerOption(Identifier.fromNamespaceAndPath("no-fog-perfected", "end_fog_multiplier"))
+                        .setName(Component.literal("End Fog Multiplier"))
+                        .setTooltip(Component.literal("Multiplies the end fog distance from the player.\nAt 0%%, the default vanilla fog distance is used (1.0x).\nHigher values scale the fog further out proportionally to the render distance.\nThe value scales quadratically for easier fine-tuning at lower multipliers."))
                         .setStorageHandler { NoFogConfig.save() }
                         .setRange(Range(FogSliderFormulas.DIMENSION_FOG_SLIDER_MIN, FogSliderFormulas.DIMENSION_FOG_SLIDER_MAX, 1))
                         .setValueFormatter { value -> Component.literal("$value%") }
                         .setBinding(
-                            { value -> NoFogConfig.endFogOffset = FogSliderFormulas.sliderToDimensionOffset(value) },
-                            { FogSliderFormulas.dimensionOffsetToSlider(NoFogConfig.endFogOffset) }
+                            { value -> NoFogConfig.endFogMultiplier = FogSliderFormulas.sliderToDimensionMultiplier(value) },
+                            { FogSliderFormulas.dimensionMultiplierToSlider(NoFogConfig.endFogMultiplier) }
                         )
                         .setDefaultValue(0)
                     )
