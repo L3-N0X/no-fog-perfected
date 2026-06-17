@@ -67,30 +67,26 @@ if (isFabric) {
 data class FabricVersionSet(
     val loader: String,
     val fabricApi: String,
-    val fabricKotlin: String,
-    val modmenu: String
+    val fabricKotlin: String
 )
 
 val fabricVersions = when (mcVersion) {
     "1.21.11" -> FabricVersionSet(
         loader = "0.18.6",
         fabricApi = "0.141.3+1.21.11",
-        fabricKotlin = "1.13.5+kotlin.2.2.10",
-        modmenu = "17.0.0"
+        fabricKotlin = "1.13.5+kotlin.2.2.10"
     )
 
     "26.1.2" -> FabricVersionSet(
         loader = "0.18.6",
         fabricApi = "0.152.1+26.1.2",
-        fabricKotlin = "1.13.10+kotlin.2.3.20",
-        modmenu = "18.0.0-alpha.8"
+        fabricKotlin = "1.13.10+kotlin.2.3.20"
     )
 
     "26.2" -> FabricVersionSet(
         loader = "0.19.3",
         fabricApi = "0.152.1+26.2",
-        fabricKotlin = "1.13.12+kotlin.2.4.0",
-        modmenu = "20.0.0-beta.2"
+        fabricKotlin = "1.13.12+kotlin.2.4.0"
     )
 
     else -> error("No Fabric versions configured for $mcVersion")
@@ -129,10 +125,6 @@ val neoforgeVersions = when (mcVersion) {
 }
 
 repositories {
-    maven {
-        name = "TerraformersMC Maven"
-        url = uri("https://maven.terraformersmc.com/releases")
-    }
     maven {
         name = "Kotlin for Forge"
         url = uri("https://thedarkcolour.github.io/KotlinForForge/")
@@ -206,12 +198,10 @@ dependencies {
             add("modImplementation", "net.fabricmc:fabric-loader:${fabricVersions.loader}")
             add("modImplementation", "net.fabricmc.fabric-api:fabric-api:${fabricVersions.fabricApi}")
             add("modImplementation", "net.fabricmc:fabric-language-kotlin:${fabricVersions.fabricKotlin}")
-            add("modImplementation", "com.terraformersmc:modmenu:${fabricVersions.modmenu}")
         } else {
             add("implementation", "net.fabricmc:fabric-loader:${fabricVersions.loader}")
             add("implementation", "net.fabricmc.fabric-api:fabric-api:${fabricVersions.fabricApi}")
             add("implementation", "net.fabricmc:fabric-language-kotlin:${fabricVersions.fabricKotlin}")
-            add("implementation", "com.terraformersmc:modmenu:${fabricVersions.modmenu}")
         }
         add("compileOnly", "net.caffeinemc:sodium-fabric-api:0.8.12+mc26.1.2")
     } else if (isNeoForge) {
@@ -340,7 +330,6 @@ publishMods {
             // Adapt dependencies based on the loader
             if (isFabric) {
                 requires("fabric-api")
-                optional("modmenu")
             }
         }
     }

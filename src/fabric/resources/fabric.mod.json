@@ -21,12 +21,6 @@
 				"adapter": "kotlin"
 			}
 		],
-		"modmenu": [
-			{
-				"value": "de.lenox.client.ModMenuIntegration",
-				"adapter": "kotlin"
-			}
-		],
 		"sodium:config_api_user": [
 			"de.lenox.client.NoFogSodiumConfig"
 		]
