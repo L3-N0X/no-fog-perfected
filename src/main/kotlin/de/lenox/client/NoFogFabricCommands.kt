@@ -1,13 +1,13 @@
 //? if fabric {
-package de.lenox.client
+/*package de.lenox.client
 
 import com.mojang.brigadier.Command
 //? if >=26.1 {
-/*import net.fabricmc.fabric.api.client.command.v2.ClientCommands
-*///?}
-//? if <26.1 {
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager as ClientCommands
+import net.fabricmc.fabric.api.client.command.v2.ClientCommands
 //?}
+//? if <26.1 {
+/*import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager as ClientCommands
+*///?}
 import net.minecraft.network.chat.Component
 import com.mojang.brigadier.CommandDispatcher
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
@@ -85,4 +85,4 @@ object NoFogFabricCommands {
         sendFeedback(Component.literal("Darkness fog: ${boolState(NoFogConfig.darknessFog)}"))
     }
 }
-//?}
+*///?}

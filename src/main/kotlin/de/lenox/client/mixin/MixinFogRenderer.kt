@@ -17,12 +17,16 @@ import org.spongepowered.asm.mixin.Shadow
 import org.spongepowered.asm.mixin.injection.At
 import org.spongepowered.asm.mixin.injection.Inject
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
+//? if <26.1 {
+/*import com.llamalad7.mixinextras.sugar.Local
+*///?}
 
 @Mixin(value = [FogRenderer::class], priority = 900)
 abstract class MixinFogRenderer {
     @Shadow
     abstract fun getFogType(camera: Camera): FogType
 
+    //? if >=26.1 {
     @Inject(method = ["setupFog"], at = [At("RETURN")])
     private fun modifyFog(
         camera: Camera,
@@ -32,6 +36,25 @@ abstract class MixinFogRenderer {
         level: ClientLevel,
         cir: CallbackInfoReturnable<FogData>
     ) {
+        modifyFogImpl(cir.returnValue, camera, level)
+    }
+    //?}
+    //? if <26.1 {
+    /*@Inject(method = ["setupFog"], at = [At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;getDevice()Lcom/mojang/blaze3d/systems/GpuDevice;", shift = At.Shift.BEFORE)])
+    private fun modifyFog(
+        camera: Camera,
+        renderDistanceInChunks: Int,
+        deltaTracker: DeltaTracker,
+        darkenWorldAmount: Float,
+        level: ClientLevel,
+        cir: CallbackInfoReturnable<org.joml.Vector4f>,
+        @Local fogData: FogData
+    ) {
+        modifyFogImpl(fogData, camera, level)
+    }
+    *///?}
+
+    private fun modifyFogImpl(fogData: FogData, camera: Camera, level: ClientLevel) {
         val fogType = this.getFogType(camera)
         val entity = camera.entity()
 
@@ -66,7 +89,6 @@ abstract class MixinFogRenderer {
             if (NoFogConfig.darknessFog && entity.hasEffect(MobEffects.DARKNESS)) return
         }
 
-        val fogData = cir.returnValue
         if (applyWaterOffset || applyLavaOffset || applyPowderSnowOffset) {
             val offset = when {
                 applyWaterOffset -> NoFogConfig.waterFogOffset
