@@ -215,6 +215,7 @@ dependencies {
         }
         add("compileOnly", "net.caffeinemc:sodium-fabric-api:0.8.12+mc26.1.2")
     } else if (isNeoForge) {
+        add("compileOnly", "net.caffeinemc:sodium-neoforge-api:0.8.12+mc26.1.2")
         if (mcVersion == "26.2") {
             val kff = dependencies.create("thedarkcolour:kotlinforforge-neoforge:${neoforgeVersions.kotlinforforge}") as ModuleDependency
             kff.exclude(mapOf("group" to "thedarkcolour", "module" to "kffmod-neoforge"))

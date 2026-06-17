@@ -26,5 +26,8 @@ Removes fog from Minecraft, perfected.
     ordering="NONE"
     side="BOTH"
 
+[modproperties.no_fog_perfected]
+    "sodium:config_api_user" = "de.lenox.client.NoFogSodiumConfig"
+
 [[mixins]]
     config="no-fog-perfected.neoforge.mixins.json"

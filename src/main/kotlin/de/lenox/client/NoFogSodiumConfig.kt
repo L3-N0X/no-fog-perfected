@@ -92,7 +92,7 @@ class NoFogSodiumConfig : ConfigEntryPoint {
                     )
                     .addOption(builder.createBooleanOption(Identifier.fromNamespaceAndPath("no-fog-perfected", "darkness_fog"))
                         .setName(Component.literal("Render Darkness Fog"))
-                        .setTooltip(Component.literal("When enabled, the darkness effect fog will be rendered.\nThis affects visibility when the darkness status effect from the Warden is active."))
+                        .setTooltip(Component.literal("When enabled, the darkness effect fog will be rendered.\nThis affects visibility when the darkness effect from the Warden is active."))
                         .setStorageHandler { NoFogConfig.save() }
                         .setBinding(
                             { value -> NoFogConfig.darknessFog = value },
