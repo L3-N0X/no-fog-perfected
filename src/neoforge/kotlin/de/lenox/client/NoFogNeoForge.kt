@@ -8,12 +8,17 @@ import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.fml.common.Mod
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent
 import net.neoforged.fml.ModContainer
 
 @Mod("no_fog_perfected")
-class NoFogNeoForge(container: ModContainer) {
-    init {
+class NoFogNeoForge(container: ModContainer)
+
+@EventBusSubscriber(modid = "no_fog_perfected", value = [Dist.CLIENT])
+object NoFogNeoForgeSetup {
+    @SubscribeEvent
+    fun onClientSetup(event: FMLClientSetupEvent) {
         NoFogConfig.init()
     }
 }

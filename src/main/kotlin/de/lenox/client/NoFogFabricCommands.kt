@@ -4,11 +4,11 @@
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.IntegerArgumentType
 //? if >=26.1 {
-import net.fabricmc.fabric.api.client.command.v2.ClientCommands
-//?}
-//? if <26.1 {
-/*import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager as ClientCommands
+/*import net.fabricmc.fabric.api.client.command.v2.ClientCommands
 *///?}
+//? if <26.1 {
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager as ClientCommands
+//?}
 import net.minecraft.network.chat.Component
 import com.mojang.brigadier.CommandDispatcher
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
