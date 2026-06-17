@@ -1,6 +1,7 @@
 package de.lenox.client.mixin
 
 import de.lenox.client.NoFogConfig
+import de.lenox.client.NoFogMod
 import net.minecraft.client.Camera
 import net.minecraft.client.DeltaTracker
 import net.minecraft.client.multiplayer.ClientLevel
@@ -44,7 +45,16 @@ abstract class MixinFogRenderer {
                 else -> false
             }
         }
-        if (keepFog) return
+
+        val applyWaterOffset = fogType == FogType.WATER && NoFogConfig.waterFog && NoFogConfig.waterFogOffset > 0f
+        val applyLavaOffset = fogType == FogType.LAVA && NoFogConfig.lavaFog && NoFogConfig.lavaFogOffset > 0f
+        val applyPowderSnowOffset = fogType == FogType.POWDER_SNOW && NoFogConfig.powderSnowFog && NoFogConfig.powderSnowFogOffset > 0f
+
+        val applyOverworldOffset = fogType == FogType.ATMOSPHERIC && level.dimension() == Level.OVERWORLD && NoFogConfig.overworldFogOffset != 1f
+        val applyNetherOffset = fogType == FogType.ATMOSPHERIC && level.dimension() == Level.NETHER && NoFogConfig.netherFogOffset != 1f
+        val applyEndOffset = fogType == FogType.ATMOSPHERIC && level.dimension() == Level.END && NoFogConfig.endFogOffset != 1f
+
+        if (keepFog && !applyWaterOffset && !applyLavaOffset && !applyPowderSnowOffset && !applyOverworldOffset && !applyNetherOffset && !applyEndOffset) return
 
         if (entity is LocalPlayer) {
             if (NoFogConfig.blindnessFog && entity.hasEffect(MobEffects.BLINDNESS)) return
@@ -52,9 +62,34 @@ abstract class MixinFogRenderer {
         }
 
         val fogData = cir.returnValue
-        fogData.environmentalStart = 1e9f
-        fogData.environmentalEnd = 1e9f
-        fogData.renderDistanceStart = 1e9f
-        fogData.renderDistanceEnd = 1e9f
+        NoFogMod.LOGGER.info("Fog type: $fogType")
+        NoFogMod.LOGGER.info("applyOverworldOffset: $applyOverworldOffset")
+        if (applyWaterOffset || applyLavaOffset || applyPowderSnowOffset) {
+            val offset = when {
+                applyWaterOffset -> NoFogConfig.waterFogOffset
+                applyLavaOffset -> NoFogConfig.lavaFogOffset
+                else -> NoFogConfig.powderSnowFogOffset
+            }
+            val maxDist = if (applyWaterOffset) 1000f else if (applyLavaOffset) 200f else 120f
+            fogData.environmentalEnd = (fogData.environmentalEnd + offset).coerceAtMost(maxDist)
+            fogData.renderDistanceEnd = (fogData.renderDistanceEnd + offset).coerceAtMost(maxDist)
+        } else if (applyOverworldOffset || applyNetherOffset || applyEndOffset) {
+            val multiplier = when {
+                applyOverworldOffset -> NoFogConfig.overworldFogOffset
+                applyNetherOffset -> NoFogConfig.netherFogOffset
+                else -> NoFogConfig.endFogOffset
+            }
+            fogData.environmentalStart *= multiplier
+            fogData.environmentalEnd *= multiplier
+            fogData.renderDistanceStart *= multiplier
+            fogData.renderDistanceEnd *= multiplier
+            NoFogMod.LOGGER.info("Overworld fog: ${fogData.environmentalStart} - ${fogData.environmentalEnd} - ${fogData.renderDistanceStart} - ${fogData.renderDistanceEnd}")
+            NoFogMod.LOGGER.info("Multiplier: $multiplier")
+        } else {
+            fogData.environmentalStart = 1e9f
+            fogData.environmentalEnd = 1e9f
+            fogData.renderDistanceStart = 1e9f
+            fogData.renderDistanceEnd = 1e9f
+        }
     }
 }

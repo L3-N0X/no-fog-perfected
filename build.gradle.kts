@@ -81,7 +81,7 @@ val fabricVersions = when (mcVersion) {
 
     "26.1.2" -> FabricVersionSet(
         loader = "0.18.6",
-        fabricApi = "0.146.1+26.1.2",
+        fabricApi = "0.152.1+26.1.2",
         fabricKotlin = "1.13.10+kotlin.2.3.20",
         modmenu = "18.0.0-alpha.8"
     )
