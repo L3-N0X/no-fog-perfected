@@ -34,122 +34,194 @@ object NoFogNeoForgeEvents {
                     showConfig { context.source.sendSystemMessage(it) }
                     Command.SINGLE_SUCCESS
                 }
+                // ── overworld ─────────────────────────────────────────────
                 .then(Commands.literal("overworld")
                     .executes { context ->
+                        context.source.sendSystemMessage(NoFogCommandFormatting.formatLine(
+                            "Overworld fog", NoFogConfig.overworldFog,
+                            "Multiplier", "${FogSliderFormulas.dimensionMultiplierToSlider(NoFogConfig.overworldFogMultiplier)}%"
+                        ))
+                        Command.SINGLE_SUCCESS
+                    }
+                    .then(Commands.literal("toggle").executes { context ->
                         NoFogConfig.overworldFog = !NoFogConfig.overworldFog
                         NoFogConfig.save()
-                        context.source.sendSystemMessage(Component.literal("Overworld fog: ${boolState(NoFogConfig.overworldFog)}"))
-                        Command.SINGLE_SUCCESS
-                    }
-                    .then(Commands.argument("value", IntegerArgumentType.integer(0, 100)).executes { context ->
-                        val value = IntegerArgumentType.getInteger(context, "value")
-                        NoFogConfig.overworldFogMultiplier = FogSliderFormulas.sliderToDimensionMultiplier(value)
-                        NoFogConfig.save()
-                        context.source.sendSystemMessage(Component.literal("Overworld fog multiplier: ${value}%"))
+                        context.source.sendSystemMessage(NoFogCommandFormatting.formatFeedback("Overworld fog", NoFogConfig.overworldFog))
                         Command.SINGLE_SUCCESS
                     })
+                    .then(Commands.literal("set")
+                        .then(Commands.argument("0-100", IntegerArgumentType.integer(0, 100)).executes { context ->
+                            val value = IntegerArgumentType.getInteger(context, "0-100")
+                            NoFogConfig.overworldFogMultiplier = FogSliderFormulas.sliderToDimensionMultiplier(value)
+                            NoFogConfig.save()
+                            context.source.sendSystemMessage(NoFogCommandFormatting.formatFeedback("Overworld fog multiplier", "${value}%"))
+                            Command.SINGLE_SUCCESS
+                        })
+                    )
                 )
+                // ── nether ────────────────────────────────────────────────
                 .then(Commands.literal("nether")
                     .executes { context ->
+                        context.source.sendSystemMessage(NoFogCommandFormatting.formatLine(
+                            "Nether fog", NoFogConfig.netherFog,
+                            "Offset", "${FogSliderFormulas.dimensionOffsetToSlider(NoFogConfig.netherFogOffset)}%"
+                        ))
+                        Command.SINGLE_SUCCESS
+                    }
+                    .then(Commands.literal("toggle").executes { context ->
                         NoFogConfig.netherFog = !NoFogConfig.netherFog
                         NoFogConfig.save()
-                        context.source.sendSystemMessage(Component.literal("Nether fog: ${boolState(NoFogConfig.netherFog)}"))
-                        Command.SINGLE_SUCCESS
-                    }
-                    .then(Commands.argument("value", IntegerArgumentType.integer(0, 100)).executes { context ->
-                        val value = IntegerArgumentType.getInteger(context, "value")
-                        NoFogConfig.netherFogOffset = FogSliderFormulas.sliderToDimensionOffset(value)
-                        NoFogConfig.save()
-                        context.source.sendSystemMessage(Component.literal("Nether fog offset: ${value}%"))
+                        context.source.sendSystemMessage(NoFogCommandFormatting.formatFeedback("Nether fog", NoFogConfig.netherFog))
                         Command.SINGLE_SUCCESS
                     })
+                    .then(Commands.literal("set")
+                        .then(Commands.argument("0-100", IntegerArgumentType.integer(0, 100)).executes { context ->
+                            val value = IntegerArgumentType.getInteger(context, "0-100")
+                            NoFogConfig.netherFogOffset = FogSliderFormulas.sliderToDimensionOffset(value)
+                            NoFogConfig.save()
+                            context.source.sendSystemMessage(NoFogCommandFormatting.formatFeedback("Nether fog offset", "${value}%"))
+                            Command.SINGLE_SUCCESS
+                        })
+                    )
                 )
+                // ── end ───────────────────────────────────────────────────
                 .then(Commands.literal("end")
                     .executes { context ->
+                        context.source.sendSystemMessage(NoFogCommandFormatting.formatLine(
+                            "End fog", NoFogConfig.endFog,
+                            "Multiplier", "${FogSliderFormulas.dimensionMultiplierToSlider(NoFogConfig.endFogMultiplier)}%"
+                        ))
+                        Command.SINGLE_SUCCESS
+                    }
+                    .then(Commands.literal("toggle").executes { context ->
                         NoFogConfig.endFog = !NoFogConfig.endFog
                         NoFogConfig.save()
-                        context.source.sendSystemMessage(Component.literal("End fog: ${boolState(NoFogConfig.endFog)}"))
-                        Command.SINGLE_SUCCESS
-                    }
-                    .then(Commands.argument("value", IntegerArgumentType.integer(0, 100)).executes { context ->
-                        val value = IntegerArgumentType.getInteger(context, "value")
-                        NoFogConfig.endFogMultiplier = FogSliderFormulas.sliderToDimensionMultiplier(value)
-                        NoFogConfig.save()
-                        context.source.sendSystemMessage(Component.literal("End fog multiplier: ${value}%"))
+                        context.source.sendSystemMessage(NoFogCommandFormatting.formatFeedback("End fog", NoFogConfig.endFog))
                         Command.SINGLE_SUCCESS
                     })
+                    .then(Commands.literal("set")
+                        .then(Commands.argument("0-100", IntegerArgumentType.integer(0, 100)).executes { context ->
+                            val value = IntegerArgumentType.getInteger(context, "0-100")
+                            NoFogConfig.endFogMultiplier = FogSliderFormulas.sliderToDimensionMultiplier(value)
+                            NoFogConfig.save()
+                            context.source.sendSystemMessage(NoFogCommandFormatting.formatFeedback("End fog multiplier", "${value}%"))
+                            Command.SINGLE_SUCCESS
+                        })
+                    )
                 )
+                // ── water ─────────────────────────────────────────────────
                 .then(Commands.literal("water")
                     .executes { context ->
+                        context.source.sendSystemMessage(NoFogCommandFormatting.formatLine(
+                            "Water fog", NoFogConfig.waterFog,
+                            "Offset", "${FogSliderFormulas.fluidOffsetToSlider(NoFogConfig.waterFogOffset, FogSliderFormulas.WATER_MAX_DISTANCE)}%"
+                        ))
+                        Command.SINGLE_SUCCESS
+                    }
+                    .then(Commands.literal("toggle").executes { context ->
                         NoFogConfig.waterFog = !NoFogConfig.waterFog
                         NoFogConfig.save()
-                        context.source.sendSystemMessage(Component.literal("Water fog: ${boolState(NoFogConfig.waterFog)}"))
-                        Command.SINGLE_SUCCESS
-                    }
-                    .then(Commands.argument("value", IntegerArgumentType.integer(0, 100)).executes { context ->
-                        val value = IntegerArgumentType.getInteger(context, "value")
-                        NoFogConfig.waterFogOffset = FogSliderFormulas.sliderToFluidOffset(value, FogSliderFormulas.WATER_MAX_DISTANCE)
-                        NoFogConfig.save()
-                        context.source.sendSystemMessage(Component.literal("Water fog offset: ${value}%"))
+                        context.source.sendSystemMessage(NoFogCommandFormatting.formatFeedback("Water fog", NoFogConfig.waterFog))
                         Command.SINGLE_SUCCESS
                     })
+                    .then(Commands.literal("set")
+                        .then(Commands.argument("0-100", IntegerArgumentType.integer(0, 100)).executes { context ->
+                            val value = IntegerArgumentType.getInteger(context, "0-100")
+                            NoFogConfig.waterFogOffset = FogSliderFormulas.sliderToFluidOffset(value, FogSliderFormulas.WATER_MAX_DISTANCE)
+                            NoFogConfig.save()
+                            context.source.sendSystemMessage(NoFogCommandFormatting.formatFeedback("Water fog offset", "${value}%"))
+                            Command.SINGLE_SUCCESS
+                        })
+                    )
                 )
+                // ── lava ──────────────────────────────────────────────────
                 .then(Commands.literal("lava")
                     .executes { context ->
+                        context.source.sendSystemMessage(NoFogCommandFormatting.formatLine(
+                            "Lava fog", NoFogConfig.lavaFog,
+                            "Offset", "${FogSliderFormulas.fluidOffsetToSlider(NoFogConfig.lavaFogOffset, FogSliderFormulas.LAVA_MAX_DISTANCE)}%"
+                        ))
+                        Command.SINGLE_SUCCESS
+                    }
+                    .then(Commands.literal("toggle").executes { context ->
                         NoFogConfig.lavaFog = !NoFogConfig.lavaFog
                         NoFogConfig.save()
-                        context.source.sendSystemMessage(Component.literal("Lava fog: ${boolState(NoFogConfig.lavaFog)}"))
-                        Command.SINGLE_SUCCESS
-                    }
-                    .then(Commands.argument("value", IntegerArgumentType.integer(0, 100)).executes { context ->
-                        val value = IntegerArgumentType.getInteger(context, "value")
-                        NoFogConfig.lavaFogOffset = FogSliderFormulas.sliderToFluidOffset(value, FogSliderFormulas.LAVA_MAX_DISTANCE)
-                        NoFogConfig.save()
-                        context.source.sendSystemMessage(Component.literal("Lava fog offset: ${value}%"))
+                        context.source.sendSystemMessage(NoFogCommandFormatting.formatFeedback("Lava fog", NoFogConfig.lavaFog))
                         Command.SINGLE_SUCCESS
                     })
+                    .then(Commands.literal("set")
+                        .then(Commands.argument("0-100", IntegerArgumentType.integer(0, 100)).executes { context ->
+                            val value = IntegerArgumentType.getInteger(context, "0-100")
+                            NoFogConfig.lavaFogOffset = FogSliderFormulas.sliderToFluidOffset(value, FogSliderFormulas.LAVA_MAX_DISTANCE)
+                            NoFogConfig.save()
+                            context.source.sendSystemMessage(NoFogCommandFormatting.formatFeedback("Lava fog offset", "${value}%"))
+                            Command.SINGLE_SUCCESS
+                        })
+                    )
                 )
+                // ── powder_snow ───────────────────────────────────────────
                 .then(Commands.literal("powder_snow")
                     .executes { context ->
-                        NoFogConfig.powderSnowFog = !NoFogConfig.powderSnowFog
-                        NoFogConfig.save()
-                        context.source.sendSystemMessage(Component.literal("Powder snow fog: ${boolState(NoFogConfig.powderSnowFog)}"))
+                        context.source.sendSystemMessage(NoFogCommandFormatting.formatLine(
+                            "Powder snow fog", NoFogConfig.powderSnowFog,
+                            "Offset", "${FogSliderFormulas.fluidOffsetToSlider(NoFogConfig.powderSnowFogOffset, FogSliderFormulas.POWDER_SNOW_MAX_DISTANCE)}%"
+                        ))
                         Command.SINGLE_SUCCESS
                     }
-                    .then(Commands.argument("value", IntegerArgumentType.integer(0, 100)).executes { context ->
-                        val value = IntegerArgumentType.getInteger(context, "value")
-                        NoFogConfig.powderSnowFogOffset = FogSliderFormulas.sliderToFluidOffset(value, FogSliderFormulas.POWDER_SNOW_MAX_DISTANCE)
+                    .then(Commands.literal("toggle").executes { context ->
+                        NoFogConfig.powderSnowFog = !NoFogConfig.powderSnowFog
                         NoFogConfig.save()
-                        context.source.sendSystemMessage(Component.literal("Powder snow fog offset: ${value}%"))
+                        context.source.sendSystemMessage(NoFogCommandFormatting.formatFeedback("Powder snow fog", NoFogConfig.powderSnowFog))
+                        Command.SINGLE_SUCCESS
+                    })
+                    .then(Commands.literal("set")
+                        .then(Commands.argument("0-100", IntegerArgumentType.integer(0, 100)).executes { context ->
+                            val value = IntegerArgumentType.getInteger(context, "0-100")
+                            NoFogConfig.powderSnowFogOffset = FogSliderFormulas.sliderToFluidOffset(value, FogSliderFormulas.POWDER_SNOW_MAX_DISTANCE)
+                            NoFogConfig.save()
+                            context.source.sendSystemMessage(NoFogCommandFormatting.formatFeedback("Powder snow fog offset", "${value}%"))
+                            Command.SINGLE_SUCCESS
+                        })
+                    )
+                )
+                // ── blindness (toggle-only) ───────────────────────────────
+                .then(Commands.literal("blindness")
+                    .executes { context ->
+                        context.source.sendSystemMessage(NoFogCommandFormatting.formatLine("Blindness fog", NoFogConfig.blindnessFog))
+                        Command.SINGLE_SUCCESS
+                    }
+                    .then(Commands.literal("toggle").executes { context ->
+                        NoFogConfig.blindnessFog = !NoFogConfig.blindnessFog
+                        NoFogConfig.save()
+                        context.source.sendSystemMessage(NoFogCommandFormatting.formatFeedback("Blindness fog", NoFogConfig.blindnessFog))
                         Command.SINGLE_SUCCESS
                     })
                 )
-                .then(Commands.literal("blindness").executes { context ->
-                    NoFogConfig.blindnessFog = !NoFogConfig.blindnessFog
-                    NoFogConfig.save()
-                    context.source.sendSystemMessage(Component.literal("Blindness fog: ${boolState(NoFogConfig.blindnessFog)}"))
-                    Command.SINGLE_SUCCESS
-                })
-                .then(Commands.literal("darkness").executes { context ->
-                    NoFogConfig.darknessFog = !NoFogConfig.darknessFog
-                    NoFogConfig.save()
-                    context.source.sendSystemMessage(Component.literal("Darkness fog: ${boolState(NoFogConfig.darknessFog)}"))
-                    Command.SINGLE_SUCCESS
-                })
+                // ── darkness (toggle-only) ────────────────────────────────
+                .then(Commands.literal("darkness")
+                    .executes { context ->
+                        context.source.sendSystemMessage(NoFogCommandFormatting.formatLine("Darkness fog", NoFogConfig.darknessFog))
+                        Command.SINGLE_SUCCESS
+                    }
+                    .then(Commands.literal("toggle").executes { context ->
+                        NoFogConfig.darknessFog = !NoFogConfig.darknessFog
+                        NoFogConfig.save()
+                        context.source.sendSystemMessage(NoFogCommandFormatting.formatFeedback("Darkness fog", NoFogConfig.darknessFog))
+                        Command.SINGLE_SUCCESS
+                    })
+                )
         )
     }
 
-    private fun boolState(value: Boolean) = if (value) "ON" else "OFF"
-
     private fun showConfig(sendMessage: (Component) -> Unit) {
-        sendMessage(Component.literal("--- No Fog Config ---"))
-        sendMessage(Component.literal("Overworld fog: ${boolState(NoFogConfig.overworldFog)} | Multiplier: ${FogSliderFormulas.dimensionMultiplierToSlider(NoFogConfig.overworldFogMultiplier)}%"))
-        sendMessage(Component.literal("Nether fog: ${boolState(NoFogConfig.netherFog)} | Offset: ${FogSliderFormulas.dimensionOffsetToSlider(NoFogConfig.netherFogOffset)}%"))
-        sendMessage(Component.literal("End fog: ${boolState(NoFogConfig.endFog)} | Multiplier: ${FogSliderFormulas.dimensionMultiplierToSlider(NoFogConfig.endFogMultiplier)}%"))
-        sendMessage(Component.literal("Water fog: ${boolState(NoFogConfig.waterFog)} | Offset: ${FogSliderFormulas.fluidOffsetToSlider(NoFogConfig.waterFogOffset, FogSliderFormulas.WATER_MAX_DISTANCE)}%"))
-        sendMessage(Component.literal("Lava fog: ${boolState(NoFogConfig.lavaFog)} | Offset: ${FogSliderFormulas.fluidOffsetToSlider(NoFogConfig.lavaFogOffset, FogSliderFormulas.LAVA_MAX_DISTANCE)}%"))
-        sendMessage(Component.literal("Powder snow fog: ${boolState(NoFogConfig.powderSnowFog)} | Offset: ${FogSliderFormulas.fluidOffsetToSlider(NoFogConfig.powderSnowFogOffset, FogSliderFormulas.POWDER_SNOW_MAX_DISTANCE)}%"))
-        sendMessage(Component.literal("Blindness fog: ${boolState(NoFogConfig.blindnessFog)}"))
-        sendMessage(Component.literal("Darkness fog: ${boolState(NoFogConfig.darknessFog)}"))
+        sendMessage(NoFogCommandFormatting.formatHeader("No Fog Config"))
+        sendMessage(NoFogCommandFormatting.formatLine("Overworld fog", NoFogConfig.overworldFog, "Multiplier", "${FogSliderFormulas.dimensionMultiplierToSlider(NoFogConfig.overworldFogMultiplier)}%"))
+        sendMessage(NoFogCommandFormatting.formatLine("Nether fog", NoFogConfig.netherFog, "Offset", "${FogSliderFormulas.dimensionOffsetToSlider(NoFogConfig.netherFogOffset)}%"))
+        sendMessage(NoFogCommandFormatting.formatLine("End fog", NoFogConfig.endFog, "Multiplier", "${FogSliderFormulas.dimensionMultiplierToSlider(NoFogConfig.endFogMultiplier)}%"))
+        sendMessage(NoFogCommandFormatting.formatLine("Water fog", NoFogConfig.waterFog, "Offset", "${FogSliderFormulas.fluidOffsetToSlider(NoFogConfig.waterFogOffset, FogSliderFormulas.WATER_MAX_DISTANCE)}%"))
+        sendMessage(NoFogCommandFormatting.formatLine("Lava fog", NoFogConfig.lavaFog, "Offset", "${FogSliderFormulas.fluidOffsetToSlider(NoFogConfig.lavaFogOffset, FogSliderFormulas.LAVA_MAX_DISTANCE)}%"))
+        sendMessage(NoFogCommandFormatting.formatLine("Powder snow fog", NoFogConfig.powderSnowFog, "Offset", "${FogSliderFormulas.fluidOffsetToSlider(NoFogConfig.powderSnowFogOffset, FogSliderFormulas.POWDER_SNOW_MAX_DISTANCE)}%"))
+        sendMessage(NoFogCommandFormatting.formatLine("Blindness fog", NoFogConfig.blindnessFog))
+        sendMessage(NoFogCommandFormatting.formatLine("Darkness fog", NoFogConfig.darknessFog))
     }
 }

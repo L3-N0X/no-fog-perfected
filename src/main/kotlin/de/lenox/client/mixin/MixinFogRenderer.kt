@@ -18,8 +18,8 @@ import org.spongepowered.asm.mixin.injection.At
 import org.spongepowered.asm.mixin.injection.Inject
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 //? if <26.1 {
-import com.llamalad7.mixinextras.sugar.Local
-//?}
+/*import com.llamalad7.mixinextras.sugar.Local
+*///?}
 
 @Mixin(value = [FogRenderer::class], priority = 900)
 abstract class MixinFogRenderer {
@@ -27,7 +27,7 @@ abstract class MixinFogRenderer {
     abstract fun getFogType(camera: Camera): FogType
 
     //? if >=26.1 {
-    /*@Inject(method = ["setupFog"], at = [At("RETURN")])
+    @Inject(method = ["setupFog"], at = [At("RETURN")])
     private fun modifyFog(
         camera: Camera,
         renderDistanceInChunks: Int,
@@ -38,9 +38,9 @@ abstract class MixinFogRenderer {
     ) {
         modifyFogImpl(cir.returnValue, camera, level)
     }
-    *///?}
+    //?}
     //? if <26.1 {
-    @Inject(method = ["setupFog"], at = [At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;getDevice()Lcom/mojang/blaze3d/systems/GpuDevice;", shift = At.Shift.BEFORE)])
+    /*@Inject(method = ["setupFog"], at = [At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;getDevice()Lcom/mojang/blaze3d/systems/GpuDevice;", shift = At.Shift.BEFORE)])
     private fun modifyFog(
         camera: Camera,
         renderDistanceInChunks: Int,
@@ -52,7 +52,7 @@ abstract class MixinFogRenderer {
     ) {
         modifyFogImpl(fogData, camera, level)
     }
-    //?}
+    *///?}
 
     private fun modifyFogImpl(fogData: FogData, camera: Camera, level: ClientLevel) {
         val fogType = this.getFogType(camera)
