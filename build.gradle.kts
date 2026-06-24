@@ -324,7 +324,7 @@ publishMods {
     if (modrinthToken.isPresent) {
         modrinth {
             accessToken.set(modrinthToken)
-            projectId.set("Lgo2vvWd") // Replace with your actual project ID
+            projectId.set("KtwO5TWA") 
             minecraftVersions.add(mcVersion)
 
             // Adapt dependencies based on the loader
