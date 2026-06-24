@@ -10,7 +10,7 @@ import net.minecraft.resources.Identifier
 class NoFogSodiumConfig : ConfigEntryPoint {
     override fun registerConfigLate(builder: ConfigBuilder) {
         builder.registerOwnModOptions()
-            .setIcon(Identifier.fromNamespaceAndPath("no-fog-perfected", "icon.png"))
+            .setIcon(Identifier.fromNamespaceAndPath("no-fog-perfected", "icon_mono.png"))
             .addPage(builder.createOptionPage()
                 .setName(Component.literal("General"))
                 .addOptionGroup(builder.createOptionGroup()
