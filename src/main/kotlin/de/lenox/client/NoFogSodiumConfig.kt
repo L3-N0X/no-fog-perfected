@@ -213,6 +213,43 @@ class NoFogSodiumConfig : ConfigEntryPoint {
                         .setDefaultValue(0)
                     )
                 )
+                .addOptionGroup(builder.createOptionGroup()
+                    .setName(Component.literal("Status Effect Fog Offset"))
+                    .addOption(builder.createIntegerOption(Identifier.fromNamespaceAndPath("no-fog-perfected", "blindness_fog_offset"))
+                        .setName(Component.literal("Blindness Fog Offset"))
+                        .setTooltip(Component.literal("Makes you see further when blind.\n0% = Vanilla. Requires Render Blindness Fog to be enabled."))
+                        .setStorageHandler { NoFogConfig.save() }
+                        .setRange(Range(FogSliderFormulas.FLUID_FOG_SLIDER_MIN, FogSliderFormulas.FLUID_FOG_SLIDER_MAX, 1))
+                        .setValueFormatter { value -> Component.literal("$value%") }
+                        .setBinding(
+                            { value -> NoFogConfig.blindnessFogOffset = FogSliderFormulas.sliderToFluidOffset(value, FogSliderFormulas.BLINDNESS_MAX_DISTANCE) },
+                            { FogSliderFormulas.fluidOffsetToSlider(NoFogConfig.blindnessFogOffset, FogSliderFormulas.BLINDNESS_MAX_DISTANCE) }
+                        )
+                        .setControlHiddenWhenDisabled(false)
+                        .setEnabledProvider(
+                            { state -> state.readBooleanOption(Identifier.fromNamespaceAndPath("no-fog-perfected", "blindness_fog")) },
+                            Identifier.fromNamespaceAndPath("no-fog-perfected", "blindness_fog")
+                        )
+                        .setDefaultValue(0)
+                    )
+                    .addOption(builder.createIntegerOption(Identifier.fromNamespaceAndPath("no-fog-perfected", "darkness_fog_offset"))
+                        .setName(Component.literal("Darkness Fog Offset"))
+                        .setTooltip(Component.literal("Makes you see further under darkness.\n0% = Vanilla. Requires Render Darkness Fog to be enabled."))
+                        .setStorageHandler { NoFogConfig.save() }
+                        .setRange(Range(FogSliderFormulas.FLUID_FOG_SLIDER_MIN, FogSliderFormulas.FLUID_FOG_SLIDER_MAX, 1))
+                        .setValueFormatter { value -> Component.literal("$value%") }
+                        .setBinding(
+                            { value -> NoFogConfig.darknessFogOffset = FogSliderFormulas.sliderToFluidOffset(value, FogSliderFormulas.DARKNESS_MAX_DISTANCE) },
+                            { FogSliderFormulas.fluidOffsetToSlider(NoFogConfig.darknessFogOffset, FogSliderFormulas.DARKNESS_MAX_DISTANCE) }
+                        )
+                        .setControlHiddenWhenDisabled(false)
+                        .setEnabledProvider(
+                            { state -> state.readBooleanOption(Identifier.fromNamespaceAndPath("no-fog-perfected", "darkness_fog")) },
+                            Identifier.fromNamespaceAndPath("no-fog-perfected", "darkness_fog")
+                        )
+                        .setDefaultValue(0)
+                    )
+                )
             )
     }
 }

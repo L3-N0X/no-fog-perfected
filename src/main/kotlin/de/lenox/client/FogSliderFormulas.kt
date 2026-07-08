@@ -13,6 +13,8 @@ object FogSliderFormulas {
     const val LAVA_MAX_DISTANCE = 200f
     const val POWDER_SNOW_MAX_DISTANCE = 120f
     const val DIMENSION_MAX_DISTANCE = 800f
+    const val BLINDNESS_MAX_DISTANCE = 120f
+    const val DARKNESS_MAX_DISTANCE = 120f
 
     const val DIMENSION_FOG_MULTIPLIER_MIN = 1.0
     const val DIMENSION_FOG_MULTIPLIER_MAX = 5.0

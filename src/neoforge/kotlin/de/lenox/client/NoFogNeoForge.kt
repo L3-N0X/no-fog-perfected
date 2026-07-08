@@ -184,10 +184,13 @@ object NoFogNeoForgeEvents {
                         })
                     )
                 )
-                // ── blindness (toggle-only) ───────────────────────────────
+                // ── blindness ─────────────────────────────────────────────
                 .then(Commands.literal("blindness")
                     .executes { context ->
-                        context.source.sendSystemMessage(NoFogCommandFormatting.formatLine("Blindness fog", NoFogConfig.blindnessFog))
+                        context.source.sendSystemMessage(NoFogCommandFormatting.formatLine(
+                            "Blindness fog", NoFogConfig.blindnessFog,
+                            "Offset", "${FogSliderFormulas.fluidOffsetToSlider(NoFogConfig.blindnessFogOffset, FogSliderFormulas.BLINDNESS_MAX_DISTANCE)}%"
+                        ))
                         Command.SINGLE_SUCCESS
                     }
                     .then(Commands.literal("toggle").executes { context ->
@@ -196,11 +199,23 @@ object NoFogNeoForgeEvents {
                         context.source.sendSystemMessage(NoFogCommandFormatting.formatFeedback("Blindness fog", NoFogConfig.blindnessFog))
                         Command.SINGLE_SUCCESS
                     })
+                    .then(Commands.literal("set")
+                        .then(Commands.argument("0-100", IntegerArgumentType.integer(0, 100)).executes { context ->
+                            val value = IntegerArgumentType.getInteger(context, "0-100")
+                            NoFogConfig.blindnessFogOffset = FogSliderFormulas.sliderToFluidOffset(value, FogSliderFormulas.BLINDNESS_MAX_DISTANCE)
+                            NoFogConfig.save()
+                            context.source.sendSystemMessage(NoFogCommandFormatting.formatFeedback("Blindness fog offset", "${value}%"))
+                            Command.SINGLE_SUCCESS
+                        })
+                    )
                 )
-                // ── darkness (toggle-only) ────────────────────────────────
+                // ── darkness ──────────────────────────────────────────────
                 .then(Commands.literal("darkness")
                     .executes { context ->
-                        context.source.sendSystemMessage(NoFogCommandFormatting.formatLine("Darkness fog", NoFogConfig.darknessFog))
+                        context.source.sendSystemMessage(NoFogCommandFormatting.formatLine(
+                            "Darkness fog", NoFogConfig.darknessFog,
+                            "Offset", "${FogSliderFormulas.fluidOffsetToSlider(NoFogConfig.darknessFogOffset, FogSliderFormulas.DARKNESS_MAX_DISTANCE)}%"
+                        ))
                         Command.SINGLE_SUCCESS
                     }
                     .then(Commands.literal("toggle").executes { context ->
@@ -209,6 +224,15 @@ object NoFogNeoForgeEvents {
                         context.source.sendSystemMessage(NoFogCommandFormatting.formatFeedback("Darkness fog", NoFogConfig.darknessFog))
                         Command.SINGLE_SUCCESS
                     })
+                    .then(Commands.literal("set")
+                        .then(Commands.argument("0-100", IntegerArgumentType.integer(0, 100)).executes { context ->
+                            val value = IntegerArgumentType.getInteger(context, "0-100")
+                            NoFogConfig.darknessFogOffset = FogSliderFormulas.sliderToFluidOffset(value, FogSliderFormulas.DARKNESS_MAX_DISTANCE)
+                            NoFogConfig.save()
+                            context.source.sendSystemMessage(NoFogCommandFormatting.formatFeedback("Darkness fog offset", "${value}%"))
+                            Command.SINGLE_SUCCESS
+                        })
+                    )
                 )
         )
     }
@@ -221,7 +245,7 @@ object NoFogNeoForgeEvents {
         sendMessage(NoFogCommandFormatting.formatLine("Water fog", NoFogConfig.waterFog, "Offset", "${FogSliderFormulas.fluidOffsetToSlider(NoFogConfig.waterFogOffset, FogSliderFormulas.WATER_MAX_DISTANCE)}%"))
         sendMessage(NoFogCommandFormatting.formatLine("Lava fog", NoFogConfig.lavaFog, "Offset", "${FogSliderFormulas.fluidOffsetToSlider(NoFogConfig.lavaFogOffset, FogSliderFormulas.LAVA_MAX_DISTANCE)}%"))
         sendMessage(NoFogCommandFormatting.formatLine("Powder snow fog", NoFogConfig.powderSnowFog, "Offset", "${FogSliderFormulas.fluidOffsetToSlider(NoFogConfig.powderSnowFogOffset, FogSliderFormulas.POWDER_SNOW_MAX_DISTANCE)}%"))
-        sendMessage(NoFogCommandFormatting.formatLine("Blindness fog", NoFogConfig.blindnessFog))
-        sendMessage(NoFogCommandFormatting.formatLine("Darkness fog", NoFogConfig.darknessFog))
+        sendMessage(NoFogCommandFormatting.formatLine("Blindness fog", NoFogConfig.blindnessFog, "Offset", "${FogSliderFormulas.fluidOffsetToSlider(NoFogConfig.blindnessFogOffset, FogSliderFormulas.BLINDNESS_MAX_DISTANCE)}%"))
+        sendMessage(NoFogCommandFormatting.formatLine("Darkness fog", NoFogConfig.darknessFog, "Offset", "${FogSliderFormulas.fluidOffsetToSlider(NoFogConfig.darknessFogOffset, FogSliderFormulas.DARKNESS_MAX_DISTANCE)}%"))
     }
 }

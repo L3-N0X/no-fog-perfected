@@ -85,8 +85,26 @@ abstract class MixinFogRenderer {
         if (keepFog && !applyWaterOffset && !applyLavaOffset && !applyPowderSnowOffset && !applyOverworldOffset && !applyNetherOffset && !applyEndOffset) return
 
         if (entity is LocalPlayer) {
-            if (NoFogConfig.blindnessFog && entity.hasEffect(MobEffects.BLINDNESS)) return
-            if (NoFogConfig.darknessFog && entity.hasEffect(MobEffects.DARKNESS)) return
+            if (entity.hasEffect(MobEffects.BLINDNESS)) {
+                if (NoFogConfig.blindnessFog) {
+                    val offset = NoFogConfig.blindnessFogOffset
+                    if (offset > 0f) {
+                        fogData.environmentalEnd = (fogData.environmentalEnd + offset).coerceAtMost(FogSliderFormulas.BLINDNESS_MAX_DISTANCE)
+                        fogData.renderDistanceEnd = (fogData.renderDistanceEnd + offset).coerceAtMost(FogSliderFormulas.BLINDNESS_MAX_DISTANCE)
+                    }
+                    return
+                }
+            }
+            if (entity.hasEffect(MobEffects.DARKNESS)) {
+                if (NoFogConfig.darknessFog) {
+                    val offset = NoFogConfig.darknessFogOffset
+                    if (offset > 0f) {
+                        fogData.environmentalEnd = (fogData.environmentalEnd + offset).coerceAtMost(FogSliderFormulas.DARKNESS_MAX_DISTANCE)
+                        fogData.renderDistanceEnd = (fogData.renderDistanceEnd + offset).coerceAtMost(FogSliderFormulas.DARKNESS_MAX_DISTANCE)
+                    }
+                    return
+                }
+            }
         }
 
         if (applyWaterOffset || applyLavaOffset || applyPowderSnowOffset) {
