@@ -27,15 +27,20 @@ val isFabric = project.name.endsWith("-fabric")
 val isNeoForge = project.name.endsWith("-neoforge")
 val mcVersion = stonecutter.current.version  // This one is fine, version is global state
 
-println("[${project.rootDir}] ${project.version} - Minecraft Version is $mcVersion")
+val loader = when {
+    isFabric -> "fabric"
+    isNeoForge -> "neoforge"
+    else -> error("Unknown loader for project ${project.name}")
+}
+
+println("[${project.rootDir}] ${project.version} - Minecraft Version is $mcVersion ($loader)")
 
 stonecutter {
-    val loader = when {
-        project.name.endsWith("-fabric") -> "fabric"
-        project.name.endsWith("-neoforge") -> "neoforge"
-        else -> error("Unknown loader for project ${project.name}")
-    }
     constants.match(loader, "fabric", "neoforge")
+}
+
+base {
+    archivesName.set("${rootProject.name}-$mcVersion-$loader")
 }
 
 sourceSets {
