@@ -324,6 +324,8 @@ publishMods {
     // Set release type (STABLE, BETA, or ALPHA)
     type.set(me.modmuss50.mpp.ReleaseType.STABLE)
 
+    displayName.set("mc$mcVersion-$modVersion-$loader")
+
     // 3. Modrinth Configuration
     val modrinthToken = providers.environmentVariable("MODRINTH_TOKEN")
     if (modrinthToken.isPresent) {
