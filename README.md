@@ -19,6 +19,7 @@ If you don't want to fully disable fog but instead want to **push it further awa
 | 1.21.11           | ✓      | ✓        |
 | 26.1.2            | ✓      | ✓        |
 | 26.2              | ✓      | ✓        |
+| 26.3              | ✓      | soon     |
 
 ## Configuration
 

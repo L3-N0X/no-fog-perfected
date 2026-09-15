@@ -5,10 +5,10 @@ plugins {
     id("idea")
     id("fabric-loom") version "1.17-SNAPSHOT" apply false
     id("net.fabricmc.fabric-loom") version "1.17-SNAPSHOT" apply false
-    id("net.neoforged.moddev") version "2.0.141" apply false
+    id("net.neoforged.moddev") version "2.0.147" apply false
     id("maven-publish")
     id("me.modmuss50.mod-publish-plugin") version "1.1.0"
-    id("org.jetbrains.kotlin.jvm") version "2.4.0"
+    id("org.jetbrains.kotlin.jvm") version "2.4.20"
     id("com.google.devtools.ksp") version "2.3.6"
     id("dev.kikugie.fletching-table.fabric") version "0.1.0-alpha.23" apply false
     id("dev.kikugie.fletching-table.neoforge") version "0.1.0-alpha.23" apply false
@@ -77,21 +77,27 @@ data class FabricVersionSet(
 
 val fabricVersions = when (mcVersion) {
     "1.21.11" -> FabricVersionSet(
-        loader = "0.18.6",
-        fabricApi = "0.141.3+1.21.11",
-        fabricKotlin = "1.13.5+kotlin.2.2.10"
+        loader = "0.19.5",
+        fabricApi = "0.141.6+1.21.11",
+        fabricKotlin = "1.14.1+kotlin.2.4.20"
     )
 
     "26.1.2" -> FabricVersionSet(
-        loader = "0.18.6",
-        fabricApi = "0.152.1+26.1.2",
-        fabricKotlin = "1.13.10+kotlin.2.3.20"
+        loader = "0.19.5",
+        fabricApi = "0.155.3+26.1.2",
+        fabricKotlin = "1.14.1+kotlin.2.4.20"
     )
 
     "26.2" -> FabricVersionSet(
-        loader = "0.19.3",
-        fabricApi = "0.152.1+26.2",
-        fabricKotlin = "1.13.12+kotlin.2.4.0"
+        loader = "0.19.5",
+        fabricApi = "0.160.0+26.2",
+        fabricKotlin = "1.14.1+kotlin.2.4.20"
+    )
+
+    "26.3" -> FabricVersionSet(
+        loader = "0.19.5",
+        fabricApi = "0.160.5+26.3",
+        fabricKotlin = "1.14.1+kotlin.2.4.20"
     )
 
     else -> error("No Fabric versions configured for $mcVersion")
@@ -106,24 +112,36 @@ data class NeoForgeVersionSet(
 
 val neoforgeVersions = when (mcVersion) {
     "1.21.11" -> NeoForgeVersionSet(
-        kotlinforforge = "6.2.0",
-        neoforgeVersion = "21.11.42",
+        kotlinforforge = "6.3.0",
+        neoforgeVersion = "21.11.45",
         neoforgeVersionRange = "[21.11,)",
         minecraftVersionRange = "[1.21.11,)"
     )
 
     "26.1.2" -> NeoForgeVersionSet(
-        kotlinforforge = "6.2.0",
-        neoforgeVersion = "26.1.2.76",
+        kotlinforforge = "6.3.0",
+        neoforgeVersion = "26.1.2.109",
         neoforgeVersionRange = "[26.1,)",
         minecraftVersionRange = "[26.1,)"
     )
 
     "26.2" -> NeoForgeVersionSet(
-        kotlinforforge = "6.2.0",
-        neoforgeVersion = "26.2.0.0-beta",
-        neoforgeVersionRange = "[26.2.0.0-beta,)",
+        kotlinforforge = "6.3.0",
+        neoforgeVersion = "26.2.0.88",
+        neoforgeVersionRange = "[26.2,)",
         minecraftVersionRange = "[26.2,)"
+    )
+
+    // TODO(26.3): placeholder - NeoForge has published nothing for 26.3 yet.
+    // The `26.3-neoforge` subproject stays commented out in settings.gradle.kts
+    // until these are real. KFF 6.3.0 declares minecraft [1.21.9,26.3), so this
+    // version goes through the `patchKotlinForForge` workaround below - drop it
+    // from `kffNeedsPatch` once a KFF release covers 26.3.
+    "26.3" -> NeoForgeVersionSet(
+        kotlinforforge = "6.3.0",
+        neoforgeVersion = "26.3.0.0-beta",
+        neoforgeVersionRange = "[26.3.0.0-beta,)",
+        minecraftVersionRange = "[26.3,)"
     )
 
     else -> error("No NeoForge versions configured for $mcVersion")
@@ -164,6 +182,10 @@ if (isFabric) {
     }
 }
 
+// Kotlin for Forge caps its supported Minecraft range; for versions newer than the
+// latest KFF release we repackage kffmod with the upper bound removed.
+val kffNeedsPatch = isNeoForge && mcVersion == "26.3"
+
 val patchedKff = configurations.create("patchedKff")
 
 val unzipKff = tasks.register<Copy>("unzipKff") {
@@ -177,7 +199,7 @@ val unzipKff = tasks.register<Copy>("unzipKff") {
         val tomlFile = layout.buildDirectory.file("tmp/unzipKff/META-INF/neoforge.mods.toml").get().asFile
         if (tomlFile.exists()) {
             var content = tomlFile.readText()
-            content = content.replace("versionRange=\"[1.21.9,26.2)\"", "versionRange=\"[1.21.9,)\"")
+            content = content.replace(Regex("""versionRange="\[1\.21\.9,[^)\]]*\)""""), "versionRange=\"[1.21.9,)\"")
             tomlFile.writeText(content)
         }
     }
@@ -190,8 +212,15 @@ val patchKotlinForForge = tasks.register<Zip>("patchKotlinForForge") {
     destinationDirectory.set(layout.buildDirectory.dir("libs"))
 }
 
+// Sodium's config API is only additive between 0.8 and 0.9. 1.21.11 has no Mojang-named
+// Sodium API artifact, so it compiles against the 26.1.2 one (identical signatures).
+val sodiumApiVersion = when (mcVersion) {
+    "26.2", "26.3" -> "0.9.2+mc$mcVersion"
+    else -> "0.9.2+mc26.1.2"
+}
+
 dependencies {
-    if (isNeoForge && mcVersion == "26.2") {
+    if (kffNeedsPatch) {
         "patchedKff"("thedarkcolour:kffmod-neoforge:${neoforgeVersions.kotlinforforge}")
     }
     if (isFabric) {
@@ -208,10 +237,10 @@ dependencies {
             add("implementation", "net.fabricmc.fabric-api:fabric-api:${fabricVersions.fabricApi}")
             add("implementation", "net.fabricmc:fabric-language-kotlin:${fabricVersions.fabricKotlin}")
         }
-        add("compileOnly", "net.caffeinemc:sodium-fabric-api:0.8.12+mc26.1.2")
+        add("compileOnly", "net.caffeinemc:sodium-fabric-api:$sodiumApiVersion")
     } else if (isNeoForge) {
-        add("compileOnly", "net.caffeinemc:sodium-neoforge-api:0.8.12+mc26.1.2")
-        if (mcVersion == "26.2") {
+        add("compileOnly", "net.caffeinemc:sodium-neoforge-api:$sodiumApiVersion")
+        if (kffNeedsPatch) {
             val kff = dependencies.create("thedarkcolour:kotlinforforge-neoforge:${neoforgeVersions.kotlinforforge}") as ModuleDependency
             kff.exclude(mapOf("group" to "thedarkcolour", "module" to "kffmod-neoforge"))
             "implementation"(kff)
@@ -226,6 +255,7 @@ val minecraftDependency = when {
     mcVersion == "1.21.11" -> ">=1.21.11 <1.22"
     mcVersion.startsWith("26.1") -> ">=26.1 <26.2"
     mcVersion.startsWith("26.2") -> ">=26.2 <26.3"
+    mcVersion.startsWith("26.3") -> ">=26.3 <26.4"
     else -> error("No minecraft dependency range configured for $mcVersion")
 }
 
