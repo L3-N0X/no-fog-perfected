@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A **client-side** Minecraft mod (Kotlin) that removes/adjusts fog. One codebase builds **7 artifacts**: Minecraft 1.21.11, 26.1.2 and 26.2 × Fabric and NeoForge, plus 26.3 Fabric (26.3 NeoForge is waiting on a NeoForge release). User-facing behaviour and commands are documented in `README.md`.
+A **client-side** Minecraft mod (Kotlin) that removes/adjusts fog. One codebase builds **8 artifacts**: Minecraft 1.21.11, 26.1.2, 26.2 and 26.3 × Fabric and NeoForge. User-facing behaviour and commands are documented in `README.md`.
 
 ## Build system: Gradle + Stonecutter
 
@@ -14,10 +14,10 @@ A **client-side** Minecraft mod (Kotlin) that removes/adjusts fog. One codebase 
 ./gradlew build                    # build all version/loader combos
 ./gradlew :26.2-fabric:build       # build one combo
 ./gradlew :26.2-fabric:runClient   # launch a dev client for that combo
-./gradlew publishMods              # publish all versions (needs MODRINTH_TOKEN)
+./gradlew publishMods              # publish all versions (needs MODRINTH_TOKEN / CURSEFORGE_TOKEN)
 ```
 
-There are **no tests** in this repo; CI (`.github/workflows/build.yml`) just runs `./gradlew build` on JDK 25. Releases are cut by pushing a `v*` / `*.*.*` tag (`.github/workflows/release.yml`).
+There are **no tests** in this repo; CI (`.github/workflows/build.yml`) just runs `./gradlew build` on JDK 25. Releases are cut by pushing a `v*` / `*.*.*` tag (`.github/workflows/release.yml`), which runs `publishMods` for every subproject → Modrinth (`KtwO5TWA`) and CurseForge (`1714461`), gated on the `MODRINTH_TOKEN` / `CURSEFORGE_TOKEN` secrets. Bump `mod_version` in `gradle.properties` first — Modrinth rejects an existing version.
 
 The **active version** for IDE resolution is set in `stonecutter.gradle.kts` (`stonecutter active "26.3-fabric"`). Source files on disk are chiseled in place for the active version — the comment/uncomment state of `//? if ...` blocks in the working tree reflects whichever version is active, so a `git diff` after switching versions is expected noise, not a real change.
 
@@ -48,9 +48,9 @@ Manifests are templated through `processResources` (`${version}`, `${minecraft_d
 
 Per-version quirks already encoded there: 1.21.11 uses `fabric-loom` with Mojang mappings and `modImplementation`/`remapJar`; 26.1.2+ uses `net.fabricmc.fabric-loom` with plain `implementation` and a non-remapped `jar`. NeoForge versions newer than the latest Kotlin-for-Forge release need KFF repackaged (`kffNeedsPatch` → `unzipKff` → `patchKotlinForForge`) to widen its `versionRange`.
 
-### 26.3 (NeoForge pending)
+### 26.3
 
-`26.3-fabric` targets the 26.3 release. NeoForge has published nothing for 26.3 yet (only NeoForm), so `26.3-neoforge` stays commented out in `settings.gradle.kts` and its `neoforgeVersions` branch holds placeholder numbers.
+NeoForge 26.3 is still beta-only (`26.3.x.y-beta`); `neoforgeVersionRange` pins the minimum to the beta it was tested against. NeoForge 26.3 replaced the mod list: it reads a square `iconFile` (plus an optional `bannerFile`) and treats `logoFile` as a deprecated banner, so `processResources` expands `${logo_property}` in `neoforge.mods.toml` to `iconFile` on >=26.3 and `logoFile` below.
 
 Kotlin for Forge 6.3.0 declares Minecraft `[1.21.9,26.3)`, so `kffNeedsPatch` in `build.gradle.kts` routes NeoForge 26.3 through the `unzipKff` → `patchKotlinForForge` repackaging. Remove 26.3 from it once a KFF release covers 26.3.
 

@@ -132,15 +132,13 @@ val neoforgeVersions = when (mcVersion) {
         minecraftVersionRange = "[26.2,)"
     )
 
-    // TODO(26.3): placeholder - NeoForge has published nothing for 26.3 yet.
-    // The `26.3-neoforge` subproject stays commented out in settings.gradle.kts
-    // until these are real. KFF 6.3.0 declares minecraft [1.21.9,26.3), so this
-    // version goes through the `patchKotlinForForge` workaround below - drop it
-    // from `kffNeedsPatch` once a KFF release covers 26.3.
+    // KFF 6.3.0 declares minecraft [1.21.9,26.3), so this version goes through the
+    // `patchKotlinForForge` workaround below - drop it from `kffNeedsPatch` once a
+    // KFF release covers 26.3.
     "26.3" -> NeoForgeVersionSet(
         kotlinforforge = "6.3.0",
-        neoforgeVersion = "26.3.0.0-beta",
-        neoforgeVersionRange = "[26.3.0.0-beta,)",
+        neoforgeVersion = "26.3.0.23-beta",
+        neoforgeVersionRange = "[26.3.0.23-beta,)",
         minecraftVersionRange = "[26.3,)"
     )
 
@@ -273,6 +271,9 @@ tasks.withType<ProcessResources>().configureEach {
             )
         }
     } else if (isNeoForge) {
+        // NeoForge 26.3's mod list shows a square `iconFile`; older versions only know `logoFile`.
+        val logoProperty = if (stonecutter.eval(mcVersion, ">=26.3")) "iconFile" else "logoFile"
+        inputs.property("logo_property", logoProperty)
         inputs.property("neoforge_version_range", neoforgeVersions.neoforgeVersionRange)
         inputs.property("minecraft_version_range", neoforgeVersions.minecraftVersionRange)
         inputs.property("kotlinforforge_version", neoforgeVersions.kotlinforforge)
@@ -281,7 +282,8 @@ tasks.withType<ProcessResources>().configureEach {
                 "version" to project.version,
                 "neoforge_version_range" to neoforgeVersions.neoforgeVersionRange,
                 "minecraft_version_range" to neoforgeVersions.minecraftVersionRange,
-                "kotlinforforge_version" to neoforgeVersions.kotlinforforge
+                "kotlinforforge_version" to neoforgeVersions.kotlinforforge,
+                "logo_property" to logoProperty
             )
         }
     }
@@ -330,6 +332,9 @@ tasks.named<Jar>("jar").configure {
 }
 
 publishMods {
+    // `DRY_RUN=1 ./gradlew publishMods` builds and validates everything without uploading
+    dryRun.set(providers.environmentVariable("DRY_RUN").isPresent)
+
     // 1. Set the release file based on the active loader
     if (isFabric) {
         if (mcVersion == "1.21.11") {
@@ -366,21 +371,29 @@ publishMods {
 
             // Adapt dependencies based on the loader
             if (isFabric) {
-                requires("fabric-api")
+                requires("fabric-api", "fabric-language-kotlin")
+            } else if (isNeoForge) {
+                requires("kotlin-for-forge")
             }
         }
     }
 
-    // 4. CurseForge Configuration (Optional, if you also want to publish there)
+    // 4. CurseForge Configuration
     val curseforgeToken = providers.environmentVariable("CURSEFORGE_TOKEN")
     if (curseforgeToken.isPresent) {
         curseforge {
             accessToken.set(curseforgeToken)
-            projectId.set("YOUR_CURSEFORGE_ID_HERE")
+            projectId.set("1714461")
+            projectSlug.set("no-fog-perfected")
             minecraftVersions.add(mcVersion)
+            javaVersions.add(javaVersion)
+            clientRequired.set(true)
+            serverRequired.set(false)
 
             if (isFabric) {
-                requires("fabric-api")
+                requires("fabric-api", "fabric-language-kotlin")
+            } else if (isNeoForge) {
+                requires("kotlin-for-forge")
             }
         }
     }

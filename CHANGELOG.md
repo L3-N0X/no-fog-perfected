@@ -1,3 +1,12 @@
+## 1.1.1
+
+### New
+- Added support for **Minecraft 26.3 on NeoForge** (requires NeoForge 26.3.0.23-beta or newer).
+- The mod is now also published on **CurseForge**.
+
+### Fixes
+- The mod icon is now shown in NeoForge's mod list (on 26.3 via the new `iconFile` property).
+
 ## 1.1.0
 
 ### New
