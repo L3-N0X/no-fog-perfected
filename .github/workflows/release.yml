@@ -27,7 +27,7 @@ jobs:
 
     env:
       MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-#      CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+      CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
       # Automatically determine release type: if manually triggered, use input. If tagged, assume stable.
       RELEASE_TYPE: ${{ github.event.inputs.release_type || 'stable' }}
 

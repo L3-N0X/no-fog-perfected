@@ -8,6 +8,7 @@ modId="no_fog_perfected"
 version="${version}"
 displayName="No Fog Perfected"
 authors="L3-N0X"
+${logo_property}="assets/no-fog-perfected/icon.png"
 description='''
 Removes fog from Minecraft, perfected.
 '''
