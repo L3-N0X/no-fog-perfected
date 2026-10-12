@@ -47,6 +47,23 @@ object NoFogCommandFormatting {
         return comp
     }
 
+    fun formatOverworldLine(): MutableComponent {
+        if (!NoFogConfig.overworldFogAdvanced) {
+            return formatLine(
+                "Overworld fog", NoFogConfig.overworldFog,
+                "Multiplier", "${FogSliderFormulas.dimensionMultiplierToSlider(NoFogConfig.overworldFogMultiplier)}%"
+            )
+        }
+        return formatLine(
+            "Overworld fog", NoFogConfig.overworldFog,
+            "Environmental", "${FogSliderFormulas.dimensionMultiplierToSlider(NoFogConfig.overworldEnvironmentalFogMultiplier)}%"
+        )
+            .append(text(" "))
+            .append(separator("|"))
+            .append(text(" Render distance: "))
+            .append(value("${FogSliderFormulas.dimensionMultiplierToSlider(NoFogConfig.overworldRenderDistanceFogMultiplier)}%"))
+    }
+
     fun formatHeader(title: String): MutableComponent {
         return separator("-- ").append(text(title, white)).append(separator(" -------------"))
     }

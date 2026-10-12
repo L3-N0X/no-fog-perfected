@@ -109,7 +109,7 @@ class NoFogSodiumConfig : ConfigEntryPoint {
                     .setName(Component.literal("Dimension Fog Multiplier"))
                     .addOption(builder.createIntegerOption(Identifier.fromNamespaceAndPath("no-fog-perfected", "overworld_fog_multiplier"))
                         .setName(Component.literal("Overworld Fog Multiplier"))
-                        .setTooltip(Component.literal("Multiplies overworld fog distance. Fog still scales with your render distance.\n0% = Vanilla. Requires Overworld fog to be enabled."))
+                        .setTooltip(Component.literal("Multiplies overworld fog distance. Fog still scales with your render distance.\n0% = Vanilla. Requires Overworld fog to be enabled and Advanced Overworld Fog Control to be disabled."))
                         .setStorageHandler { NoFogConfig.save() }
                         .setRange(Range(FogSliderFormulas.DIMENSION_FOG_SLIDER_MIN, FogSliderFormulas.DIMENSION_FOG_SLIDER_MAX, 1))
                         .setValueFormatter { value -> Component.literal("$value%") }
@@ -119,8 +119,12 @@ class NoFogSodiumConfig : ConfigEntryPoint {
                         )
                         .setControlHiddenWhenDisabled(false)
                         .setEnabledProvider(
-                            { state -> state.readBooleanOption(Identifier.fromNamespaceAndPath("no-fog-perfected", "overworld_fog")) },
-                            Identifier.fromNamespaceAndPath("no-fog-perfected", "overworld_fog")
+                            { state ->
+                                state.readBooleanOption(Identifier.fromNamespaceAndPath("no-fog-perfected", "overworld_fog")) &&
+                                    !state.readBooleanOption(Identifier.fromNamespaceAndPath("no-fog-perfected", "overworld_fog_advanced"))
+                            },
+                            Identifier.fromNamespaceAndPath("no-fog-perfected", "overworld_fog"),
+                            Identifier.fromNamespaceAndPath("no-fog-perfected", "overworld_fog_advanced")
                         )
                         .setDefaultValue(0)
                     )
@@ -155,6 +159,66 @@ class NoFogSodiumConfig : ConfigEntryPoint {
                         .setEnabledProvider(
                             { state -> state.readBooleanOption(Identifier.fromNamespaceAndPath("no-fog-perfected", "end_fog")) },
                             Identifier.fromNamespaceAndPath("no-fog-perfected", "end_fog")
+                        )
+                        .setDefaultValue(0)
+                    )
+                )
+                .addOptionGroup(builder.createOptionGroup()
+                    .setName(Component.literal("Advanced Overworld Fog"))
+                    .addOption(builder.createBooleanOption(Identifier.fromNamespaceAndPath("no-fog-perfected", "overworld_fog_advanced"))
+                        .setName(Component.literal("Advanced Overworld Fog Control"))
+                        .setTooltip(Component.literal("Configures the Overworld's environmental haze fog and the fog at the render distance edge separately, replacing the Overworld Fog Multiplier.\nRequires Overworld fog to be enabled."))
+                        .setStorageHandler { NoFogConfig.save() }
+                        .setBinding(
+                            { value -> NoFogConfig.overworldFogAdvanced = value },
+                            { NoFogConfig.overworldFogAdvanced }
+                        )
+                        .setControlHiddenWhenDisabled(false)
+                        .setEnabledProvider(
+                            { state -> state.readBooleanOption(Identifier.fromNamespaceAndPath("no-fog-perfected", "overworld_fog")) },
+                            Identifier.fromNamespaceAndPath("no-fog-perfected", "overworld_fog")
+                        )
+                        .setDefaultValue(false)
+                    )
+                    .addOption(builder.createIntegerOption(Identifier.fromNamespaceAndPath("no-fog-perfected", "overworld_environmental_fog_multiplier"))
+                        .setName(Component.literal("Environmental Fog Multiplier"))
+                        .setTooltip(Component.literal("Multiplies the distance of the Overworld's environmental haze fog.\n0% = Vanilla. Requires Overworld fog and Advanced Overworld Fog Control to be enabled."))
+                        .setStorageHandler { NoFogConfig.save() }
+                        .setRange(Range(FogSliderFormulas.DIMENSION_FOG_SLIDER_MIN, FogSliderFormulas.DIMENSION_FOG_SLIDER_MAX, 1))
+                        .setValueFormatter { value -> Component.literal("$value%") }
+                        .setBinding(
+                            { value -> NoFogConfig.overworldEnvironmentalFogMultiplier = FogSliderFormulas.sliderToDimensionMultiplier(value) },
+                            { FogSliderFormulas.dimensionMultiplierToSlider(NoFogConfig.overworldEnvironmentalFogMultiplier) }
+                        )
+                        .setControlHiddenWhenDisabled(false)
+                        .setEnabledProvider(
+                            { state ->
+                                state.readBooleanOption(Identifier.fromNamespaceAndPath("no-fog-perfected", "overworld_fog")) &&
+                                    state.readBooleanOption(Identifier.fromNamespaceAndPath("no-fog-perfected", "overworld_fog_advanced"))
+                            },
+                            Identifier.fromNamespaceAndPath("no-fog-perfected", "overworld_fog"),
+                            Identifier.fromNamespaceAndPath("no-fog-perfected", "overworld_fog_advanced")
+                        )
+                        .setDefaultValue(0)
+                    )
+                    .addOption(builder.createIntegerOption(Identifier.fromNamespaceAndPath("no-fog-perfected", "overworld_render_distance_fog_multiplier"))
+                        .setName(Component.literal("Render Distance Fog Multiplier"))
+                        .setTooltip(Component.literal("Multiplies the distance of the Overworld fog at the edge of your render distance.\n0% = Vanilla. Requires Overworld fog and Advanced Overworld Fog Control to be enabled."))
+                        .setStorageHandler { NoFogConfig.save() }
+                        .setRange(Range(FogSliderFormulas.DIMENSION_FOG_SLIDER_MIN, FogSliderFormulas.DIMENSION_FOG_SLIDER_MAX, 1))
+                        .setValueFormatter { value -> Component.literal("$value%") }
+                        .setBinding(
+                            { value -> NoFogConfig.overworldRenderDistanceFogMultiplier = FogSliderFormulas.sliderToDimensionMultiplier(value) },
+                            { FogSliderFormulas.dimensionMultiplierToSlider(NoFogConfig.overworldRenderDistanceFogMultiplier) }
+                        )
+                        .setControlHiddenWhenDisabled(false)
+                        .setEnabledProvider(
+                            { state ->
+                                state.readBooleanOption(Identifier.fromNamespaceAndPath("no-fog-perfected", "overworld_fog")) &&
+                                    state.readBooleanOption(Identifier.fromNamespaceAndPath("no-fog-perfected", "overworld_fog_advanced"))
+                            },
+                            Identifier.fromNamespaceAndPath("no-fog-perfected", "overworld_fog"),
+                            Identifier.fromNamespaceAndPath("no-fog-perfected", "overworld_fog_advanced")
                         )
                         .setDefaultValue(0)
                     )

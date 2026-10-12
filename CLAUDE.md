@@ -46,13 +46,11 @@ Source sets are wired manually in `build.gradle.kts` (there are no per-version s
 
 Manifests are templated through `processResources` (`${version}`, `${minecraft_dependency}`, `${loader_version}`, `${neoforge_version_range}`, …); the values live in the `fabricVersions` / `neoforgeVersions` `when (mcVersion)` blocks in `build.gradle.kts`. **Adding a Minecraft version means adding a branch to every one of those `when` blocks** (fabric deps, neoforge deps, `minecraftDependency`, `javaVersion`, `kotlinJvmTarget`, `JavaCompile` release) plus a `version(...)` line in `settings.gradle.kts`.
 
-Per-version quirks already encoded there: 1.21.11 uses `fabric-loom` with Mojang mappings and `modImplementation`/`remapJar`; 26.1.2+ uses `net.fabricmc.fabric-loom` with plain `implementation` and a non-remapped `jar`. NeoForge versions newer than the latest Kotlin-for-Forge release need KFF repackaged (`kffNeedsPatch` → `unzipKff` → `patchKotlinForForge`) to widen its `versionRange`.
+Per-version quirks already encoded there: 1.21.11 uses `fabric-loom` with Mojang mappings and `modImplementation`/`remapJar`; 26.1.2+ uses `net.fabricmc.fabric-loom` with plain `implementation` and a non-remapped `jar`. If a NeoForge version ever outruns the latest Kotlin-for-Forge release, KFF has to be repackaged to widen its `versionRange` (this was done for 26.3 until KFF 6.4.0 covered it).
 
 ### 26.3
 
-NeoForge 26.3 is still beta-only (`26.3.x.y-beta`); `neoforgeVersionRange` pins the minimum to the beta it was tested against. NeoForge 26.3 replaced the mod list: it reads a square `iconFile` (plus an optional `bannerFile`) and treats `logoFile` as a deprecated banner, so `processResources` expands `${logo_property}` in `neoforge.mods.toml` to `iconFile` on >=26.3 and `logoFile` below.
-
-Kotlin for Forge 6.3.0 declares Minecraft `[1.21.9,26.3)`, so `kffNeedsPatch` in `build.gradle.kts` routes NeoForge 26.3 through the `unzipKff` → `patchKotlinForForge` repackaging. Remove 26.3 from it once a KFF release covers 26.3.
+NeoForge 26.2+ replaced the mod list: it reads a square `iconFile` (plus an optional `bannerFile`) and treats `logoFile` as a deprecated banner, so `processResources` expands `${logo_property}` in `neoforge.mods.toml` to `iconFile` on >=26.2 and `logoFile` below. Kotlin for Forge 6.4.0 covers 26.3.
 
 Sodium's config API is compiled per version (`sodiumApiVersion`): `0.9.2+mc26.2` / `0.9.2+mc26.3`, and `0.9.2+mc26.1.2` for 26.1.2 and 1.21.11 (Sodium's 1.21.11 API artifact is intermediary-named). The 0.8 → 0.9 API change was purely additive.
 
@@ -68,6 +66,8 @@ The 26.3 rendering refactor moved `com.mojang.blaze3d.buffers` to `com.mojang.re
 2. If fog is enabled and no offset applies, return untouched.
 3. Blindness/darkness (checked on `LocalPlayer` effects) short-circuit before the fluid/dimension paths.
 4. Otherwise apply an additive offset (fluids, nether), a multiplier (overworld, end), or push all four `FogData` distances to `1e9f` to disable fog entirely — this is what avoids the sky cut-off other mods have.
+
+The overworld has an opt-in advanced mode (`overworldFogAdvanced`, default off): instead of `overworldFogMultiplier` scaling all four distances, `overworldEnvironmentalFogMultiplier` scales the `environmental*` pair (haze) and `overworldRenderDistanceFogMultiplier` scales the `renderDistance*` pair. With the toggle off, behaviour is unchanged.
 
 **Offsets only apply when that fog type is enabled**; disabled fog is never rendered regardless of slider.
 

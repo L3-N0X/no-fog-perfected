@@ -126,19 +126,16 @@ val neoforgeVersions = when (mcVersion) {
     )
 
     "26.2" -> NeoForgeVersionSet(
-        kotlinforforge = "6.3.0",
-        neoforgeVersion = "26.2.0.88",
+        kotlinforforge = "6.4.0",
+        neoforgeVersion = "26.2.0.90",
         neoforgeVersionRange = "[26.2,)",
         minecraftVersionRange = "[26.2,)"
     )
 
-    // KFF 6.3.0 declares minecraft [1.21.9,26.3), so this version goes through the
-    // `patchKotlinForForge` workaround below - drop it from `kffNeedsPatch` once a
-    // KFF release covers 26.3.
     "26.3" -> NeoForgeVersionSet(
-        kotlinforforge = "6.3.0",
-        neoforgeVersion = "26.3.0.23-beta",
-        neoforgeVersionRange = "[26.3.0.23-beta,)",
+        kotlinforforge = "6.4.0",
+        neoforgeVersion = "26.3.0.76",
+        neoforgeVersionRange = "[26.3.0.76,)",
         minecraftVersionRange = "[26.3,)"
     )
 
@@ -180,36 +177,6 @@ if (isFabric) {
     }
 }
 
-// Kotlin for Forge caps its supported Minecraft range; for versions newer than the
-// latest KFF release we repackage kffmod with the upper bound removed.
-val kffNeedsPatch = isNeoForge && mcVersion == "26.3"
-
-val patchedKff = configurations.create("patchedKff")
-
-val unzipKff = tasks.register<Copy>("unzipKff") {
-    val jarFile = provider { patchedKff.files.firstOrNull() }
-    dependsOn(patchedKff)
-    
-    from(provider { jarFile.get()?.let { zipTree(it) } ?: files() })
-    into(layout.buildDirectory.dir("tmp/unzipKff"))
-    
-    doLast {
-        val tomlFile = layout.buildDirectory.file("tmp/unzipKff/META-INF/neoforge.mods.toml").get().asFile
-        if (tomlFile.exists()) {
-            var content = tomlFile.readText()
-            content = content.replace(Regex("""versionRange="\[1\.21\.9,[^)\]]*\)""""), "versionRange=\"[1.21.9,)\"")
-            tomlFile.writeText(content)
-        }
-    }
-}
-
-val patchKotlinForForge = tasks.register<Zip>("patchKotlinForForge") {
-    dependsOn(unzipKff)
-    from(layout.buildDirectory.dir("tmp/unzipKff"))
-    archiveFileName.set("kffmod-neoforge-patched.jar")
-    destinationDirectory.set(layout.buildDirectory.dir("libs"))
-}
-
 // Sodium's config API is only additive between 0.8 and 0.9. 1.21.11 has no Mojang-named
 // Sodium API artifact, so it compiles against the 26.1.2 one (identical signatures).
 val sodiumApiVersion = when (mcVersion) {
@@ -218,9 +185,6 @@ val sodiumApiVersion = when (mcVersion) {
 }
 
 dependencies {
-    if (kffNeedsPatch) {
-        "patchedKff"("thedarkcolour:kffmod-neoforge:${neoforgeVersions.kotlinforforge}")
-    }
     if (isFabric) {
         add("minecraft", "com.mojang:minecraft:$mcVersion")
 
@@ -238,14 +202,7 @@ dependencies {
         add("compileOnly", "net.caffeinemc:sodium-fabric-api:$sodiumApiVersion")
     } else if (isNeoForge) {
         add("compileOnly", "net.caffeinemc:sodium-neoforge-api:$sodiumApiVersion")
-        if (kffNeedsPatch) {
-            val kff = dependencies.create("thedarkcolour:kotlinforforge-neoforge:${neoforgeVersions.kotlinforforge}") as ModuleDependency
-            kff.exclude(mapOf("group" to "thedarkcolour", "module" to "kffmod-neoforge"))
-            "implementation"(kff)
-            "implementation"(files(patchKotlinForForge.map { it.archiveFile.get() }))
-        } else {
-            "implementation"("thedarkcolour:kotlinforforge-neoforge:${neoforgeVersions.kotlinforforge}")
-        }
+        "implementation"("thedarkcolour:kotlinforforge-neoforge:${neoforgeVersions.kotlinforforge}")
     }
 }
 
@@ -271,8 +228,8 @@ tasks.withType<ProcessResources>().configureEach {
             )
         }
     } else if (isNeoForge) {
-        // NeoForge 26.3's mod list shows a square `iconFile`; older versions only know `logoFile`.
-        val logoProperty = if (stonecutter.eval(mcVersion, ">=26.3")) "iconFile" else "logoFile"
+        // NeoForge 26.2+'s mod list shows a square `iconFile`; older versions only know `logoFile`.
+        val logoProperty = if (stonecutter.eval(mcVersion, ">=26.2")) "iconFile" else "logoFile"
         inputs.property("logo_property", logoProperty)
         inputs.property("neoforge_version_range", neoforgeVersions.neoforgeVersionRange)
         inputs.property("minecraft_version_range", neoforgeVersions.minecraftVersionRange)

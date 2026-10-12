@@ -24,10 +24,7 @@ object NoFogFabricCommands {
                 // ── overworld ─────────────────────────────────────────────
                 .then(ClientCommands.literal("overworld")
                     .executes { context ->
-                        context.source.sendFeedback(NoFogCommandFormatting.formatLine(
-                            "Overworld fog", NoFogConfig.overworldFog,
-                            "Multiplier", "${FogSliderFormulas.dimensionMultiplierToSlider(NoFogConfig.overworldFogMultiplier)}%"
-                        ))
+                        context.source.sendFeedback(NoFogCommandFormatting.formatOverworldLine())
                         Command.SINGLE_SUCCESS
                     }
                     .then(ClientCommands.literal("toggle").executes { context ->
@@ -44,6 +41,54 @@ object NoFogFabricCommands {
                             context.source.sendFeedback(NoFogCommandFormatting.formatFeedback("Overworld fog multiplier", "${value}%"))
                             Command.SINGLE_SUCCESS
                         })
+                    )
+                    .then(ClientCommands.literal("advanced")
+                        .executes { context ->
+                            context.source.sendFeedback(NoFogCommandFormatting.formatFeedback("Overworld advanced fog control", NoFogConfig.overworldFogAdvanced))
+                            Command.SINGLE_SUCCESS
+                        }
+                        .then(ClientCommands.literal("toggle").executes { context ->
+                            NoFogConfig.overworldFogAdvanced = !NoFogConfig.overworldFogAdvanced
+                            NoFogConfig.save()
+                            context.source.sendFeedback(NoFogCommandFormatting.formatFeedback("Overworld advanced fog control", NoFogConfig.overworldFogAdvanced))
+                            Command.SINGLE_SUCCESS
+                        })
+                    )
+                    .then(ClientCommands.literal("environmental")
+                        .executes { context ->
+                            context.source.sendFeedback(NoFogCommandFormatting.formatFeedback(
+                                "Overworld environmental fog multiplier",
+                                "${FogSliderFormulas.dimensionMultiplierToSlider(NoFogConfig.overworldEnvironmentalFogMultiplier)}%"
+                            ))
+                            Command.SINGLE_SUCCESS
+                        }
+                        .then(ClientCommands.literal("set")
+                            .then(ClientCommands.argument("0-100", IntegerArgumentType.integer(0, 100)).executes { context ->
+                                val value = IntegerArgumentType.getInteger(context, "0-100")
+                                NoFogConfig.overworldEnvironmentalFogMultiplier = FogSliderFormulas.sliderToDimensionMultiplier(value)
+                                NoFogConfig.save()
+                                context.source.sendFeedback(NoFogCommandFormatting.formatFeedback("Overworld environmental fog multiplier", "${value}%"))
+                                Command.SINGLE_SUCCESS
+                            })
+                        )
+                    )
+                    .then(ClientCommands.literal("render_distance")
+                        .executes { context ->
+                            context.source.sendFeedback(NoFogCommandFormatting.formatFeedback(
+                                "Overworld render distance fog multiplier",
+                                "${FogSliderFormulas.dimensionMultiplierToSlider(NoFogConfig.overworldRenderDistanceFogMultiplier)}%"
+                            ))
+                            Command.SINGLE_SUCCESS
+                        }
+                        .then(ClientCommands.literal("set")
+                            .then(ClientCommands.argument("0-100", IntegerArgumentType.integer(0, 100)).executes { context ->
+                                val value = IntegerArgumentType.getInteger(context, "0-100")
+                                NoFogConfig.overworldRenderDistanceFogMultiplier = FogSliderFormulas.sliderToDimensionMultiplier(value)
+                                NoFogConfig.save()
+                                context.source.sendFeedback(NoFogCommandFormatting.formatFeedback("Overworld render distance fog multiplier", "${value}%"))
+                                Command.SINGLE_SUCCESS
+                            })
+                        )
                     )
                 )
                 // ── nether ────────────────────────────────────────────────
@@ -226,7 +271,7 @@ object NoFogFabricCommands {
 
     private fun showConfig(sendFeedback: (Component) -> Unit) {
         sendFeedback(NoFogCommandFormatting.formatHeader("No Fog Config"))
-        sendFeedback(NoFogCommandFormatting.formatLine("Overworld fog", NoFogConfig.overworldFog, "Multiplier", "${FogSliderFormulas.dimensionMultiplierToSlider(NoFogConfig.overworldFogMultiplier)}%"))
+        sendFeedback(NoFogCommandFormatting.formatOverworldLine())
         sendFeedback(NoFogCommandFormatting.formatLine("Nether fog", NoFogConfig.netherFog, "Offset", "${FogSliderFormulas.dimensionOffsetToSlider(NoFogConfig.netherFogOffset)}%"))
         sendFeedback(NoFogCommandFormatting.formatLine("End fog", NoFogConfig.endFog, "Multiplier", "${FogSliderFormulas.dimensionMultiplierToSlider(NoFogConfig.endFogMultiplier)}%"))
         sendFeedback(NoFogCommandFormatting.formatLine("Water fog", NoFogConfig.waterFog, "Offset", "${FogSliderFormulas.fluidOffsetToSlider(NoFogConfig.waterFogOffset, FogSliderFormulas.WATER_MAX_DISTANCE)}%"))

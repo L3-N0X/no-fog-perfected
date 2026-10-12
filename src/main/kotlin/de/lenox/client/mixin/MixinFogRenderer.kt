@@ -75,8 +75,14 @@ abstract class MixinFogRenderer {
         val applyPowderSnowOffset =
             fogType == FogType.POWDER_SNOW && NoFogConfig.powderSnowFog && NoFogConfig.powderSnowFogOffset > 0f
 
+        // Advanced mode scales the environmental (haze) fog and the render distance edge fog separately
+        val overworldEnvironmentalMultiplier =
+            if (NoFogConfig.overworldFogAdvanced) NoFogConfig.overworldEnvironmentalFogMultiplier else NoFogConfig.overworldFogMultiplier
+        val overworldRenderDistanceMultiplier =
+            if (NoFogConfig.overworldFogAdvanced) NoFogConfig.overworldRenderDistanceFogMultiplier else NoFogConfig.overworldFogMultiplier
         val applyOverworldOffset =
-            fogType == FogType.ATMOSPHERIC && level.dimension() == Level.OVERWORLD && NoFogConfig.overworldFog && NoFogConfig.overworldFogMultiplier > 1.0
+            fogType == FogType.ATMOSPHERIC && level.dimension() == Level.OVERWORLD && NoFogConfig.overworldFog &&
+                (overworldEnvironmentalMultiplier > 1.0 || overworldRenderDistanceMultiplier > 1.0)
         val applyNetherOffset =
             fogType == FogType.ATMOSPHERIC && level.dimension() == Level.NETHER && NoFogConfig.netherFog && NoFogConfig.netherFogOffset > 0f
         val applyEndOffset =
@@ -125,11 +131,15 @@ abstract class MixinFogRenderer {
             fogData.environmentalEnd = (fogData.environmentalEnd + NoFogConfig.netherFogOffset)
             fogData.renderDistanceStart = (fogData.renderDistanceStart + NoFogConfig.netherFogOffset / 2f)
             fogData.renderDistanceEnd = (fogData.renderDistanceEnd + NoFogConfig.netherFogOffset)
-        } else if (applyOverworldOffset || applyEndOffset) {
-            val multiplier = when {
-                applyOverworldOffset -> NoFogConfig.overworldFogMultiplier.toFloat()
-                else -> NoFogConfig.endFogMultiplier.toFloat()
-            }
+        } else if (applyOverworldOffset) {
+            val environmentalMultiplier = overworldEnvironmentalMultiplier.toFloat()
+            val renderDistanceMultiplier = overworldRenderDistanceMultiplier.toFloat()
+            fogData.environmentalStart *= environmentalMultiplier
+            fogData.environmentalEnd *= environmentalMultiplier
+            fogData.renderDistanceStart *= renderDistanceMultiplier
+            fogData.renderDistanceEnd *= renderDistanceMultiplier
+        } else if (applyEndOffset) {
+            val multiplier = NoFogConfig.endFogMultiplier.toFloat()
             fogData.environmentalStart *= multiplier + 0 * (multiplier - 1)
             fogData.environmentalEnd *= multiplier
             fogData.renderDistanceStart *= multiplier + 0 * (multiplier - 1)

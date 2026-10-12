@@ -12,6 +12,10 @@ If you don't want to fully disable fog but instead want to **push it further awa
 
 > **Important:** the offset and multiplier only have an effect when the fog for that type is **enabled**. If fog is turned off, it will never be rendered — no matter what offset or multiplier value is configured.
 
+### Advanced overworld fog control
+
+The Overworld actually renders two fogs: the **environmental haze** and the **fog at the edge of your render distance**. By default a single multiplier controls both. Turning on **Advanced Overworld Fog Control** (off by default) replaces that multiplier with two separate ones, so you can adjust the haze and the render distance fog independently. Like the regular multiplier, both only apply while Overworld fog is enabled.
+
 ## Supported Versions
 
 | Minecraft Version | Fabric | NeoForge |
@@ -39,12 +43,15 @@ When Sodium is not installed, the mod is configured exclusively through in-game 
 | `/nofog <type>` | Query the current state of a single fog type |
 | `/nofog <type> toggle` | Toggle that fog type on or off |
 | `/nofog <type> set <0-100>` | Set the intensity/distance value (0 = vanilla, 100 = maximum) |
+| `/nofog overworld advanced toggle` | Toggle advanced overworld fog control (separate haze and render distance fog) |
+| `/nofog overworld environmental set <0-100>` | Set the environmental (haze) fog multiplier — used while advanced control is on |
+| `/nofog overworld render_distance set <0-100>` | Set the render distance edge fog multiplier — used while advanced control is on |
 
 `<type>` is one of:
 
 | Type | Value control | What it does |
 |---|---|---|
-| `overworld` | Multiplier | Multiplies how far away overworld fog starts. 0% = vanilla. |
+| `overworld` | Multiplier | Multiplies how far away overworld fog starts. 0% = vanilla. Replaced by the `environmental` / `render_distance` multipliers while advanced control is on. |
 | `nether` | Offset | Pushes nether fog further away from you. 0% = vanilla. |
 | `end` | Multiplier | Multiplies how far away end fog starts. 0% = vanilla. |
 | `water` | Offset | Increases visibility range when submerged in water. 0% = vanilla. |
@@ -60,6 +67,9 @@ When Sodium is not installed, the mod is configured exclusively through in-game 
 /nofog overworld              → show overworld fog status and current multiplier
 /nofog overworld toggle       → turn overworld fog on or off
 /nofog overworld set 50       → set overworld fog multiplier to 50%
+/nofog overworld advanced toggle            → control haze and render distance fog separately
+/nofog overworld environmental set 30       → set overworld haze fog multiplier to 30%
+/nofog overworld render_distance set 80     → set overworld render distance fog multiplier to 80%
 /nofog water set 75           → push water fog boundary to 75%
 /nofog blindness toggle       → toggle blindness fog
 ```

@@ -21,6 +21,9 @@ object NoFogConfig {
     var lavaFogOffset: Float = 0f
     var powderSnowFogOffset: Float = 0f
     var overworldFogMultiplier: Double = 1.0
+    var overworldFogAdvanced: Boolean = false
+    var overworldEnvironmentalFogMultiplier: Double = 1.0
+    var overworldRenderDistanceFogMultiplier: Double = 1.0
     var netherFogOffset: Float = 0f
     var endFogMultiplier: Double = 1.0
     var blindnessFogOffset: Float = 0f
@@ -53,6 +56,9 @@ object NoFogConfig {
             lavaFogOffset = data.lavaFogOffset
             powderSnowFogOffset = data.powderSnowFogOffset
             overworldFogMultiplier = data.overworldFogMultiplier
+            overworldFogAdvanced = data.overworldFogAdvanced
+            overworldEnvironmentalFogMultiplier = data.overworldEnvironmentalFogMultiplier
+            overworldRenderDistanceFogMultiplier = data.overworldRenderDistanceFogMultiplier
             netherFogOffset = data.netherFogOffset
             endFogMultiplier = data.endFogMultiplier
             blindnessFogOffset = data.blindnessFogOffset
@@ -79,6 +85,9 @@ object NoFogConfig {
                 lavaFogOffset = lavaFogOffset,
                 powderSnowFogOffset = powderSnowFogOffset,
                 overworldFogMultiplier = overworldFogMultiplier,
+                overworldFogAdvanced = overworldFogAdvanced,
+                overworldEnvironmentalFogMultiplier = overworldEnvironmentalFogMultiplier,
+                overworldRenderDistanceFogMultiplier = overworldRenderDistanceFogMultiplier,
                 netherFogOffset = netherFogOffset,
                 endFogMultiplier = endFogMultiplier,
                 blindnessFogOffset = blindnessFogOffset,
@@ -103,6 +112,9 @@ object NoFogConfig {
         val lavaFogOffset: Float = 0f,
         val powderSnowFogOffset: Float = 0f,
         val overworldFogMultiplier: Double = 1.0,
+        val overworldFogAdvanced: Boolean = false,
+        val overworldEnvironmentalFogMultiplier: Double = 1.0,
+        val overworldRenderDistanceFogMultiplier: Double = 1.0,
         val netherFogOffset: Float = 0f,
         val endFogMultiplier: Double = 1.0,
         val blindnessFogOffset: Float = 0f,
